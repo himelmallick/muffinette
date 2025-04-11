@@ -1,0 +1,12 @@
+Package: muffinette
+Title: muffinette for meta-analysis of microbiome networks
+Version: 0.0.0.9000
+Author: Sreya Sarkar [aut], Himel Mallick [aut, cre]
+Maintainer: Himel Mallick <him4004@med.cornell.edu>
+Description: muffinette provides a consolidated framework to meta analyze differential network analysis for microbiome studies.
+License: MIT + LICENSE
+Encoding: UTF-8
+Remotes: biobakery/MMUPHin
+Imports: caret, gtools, fdrtool, robustbase, parallel, dplyr, SOHPIE, MMUPHin
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2.9000
