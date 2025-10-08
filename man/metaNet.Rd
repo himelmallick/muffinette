@@ -9,31 +9,37 @@ metaNet(
   batchvar,
   exposurevar,
   metaData,
+  count,
+  net.est.method,
   abd_threshold = NULL,
   prev_threshold = NULL,
   covariates = NULL,
-  method,
-  seed.value
+  verbose = TRUE,
+  ...
 )
 }
 \arguments{
 \item{feature_abd_list}{a list of OTU tables of different studies. Each OTU table is a sample-by-feature data frame.}
 
-\item{batchvar}{name of the batch variable. This variable in data should be a factor variable}
+\item{batchvar}{name of the batch variable. This variable in data should be a factor variable.}
 
 \item{exposurevar}{name of the exposure variable for differential abundance testing.}
 
 \item{metaData}{a data frame of metadata, columns must include exposure, batch as factor, covariates to adjust for.}
 
-\item{abd_threshold}{threshold for abundance of features, cannot be NULL if filter_ft is TRUE.}
+\item{count}{logical. If TRUE, the abundances are count. Default value: FALSE.}
 
-\item{prev_threshold}{threshold for prevalence of features, cannot be NULL if filter_ft is TRUE.}
+\item{net.est.method}{method for network estimation. Default value: "SparCC".}
 
-\item{covariates}{optional covariates for batch effect correction - default is NULL.}
+\item{abd_threshold}{threshold for abundance of features.}
 
-\item{method}{method for network estimation - default is sparcc.}
+\item{prev_threshold}{threshold for prevalence of features.}
 
-\item{seed.value}{seed for reproducibility}
+\item{covariates}{optional covariates for batch effect correction. Default value: NULL.}
+
+\item{verbose}{logical. If TRUE, print out number of iterations and computational time. Default value: TRUE.}
+
+\item{...}{additional arguments passed to \code{\link{networkEst}}.}
 }
 \value{
 list of per-feature meta-analytical differential abundance results such as data frame with columns as effect sizes, p-values and q-values, heterogeneity statistics.
