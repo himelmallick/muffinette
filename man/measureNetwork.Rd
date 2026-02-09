@@ -7,13 +7,11 @@
 measureNetwork(asso.matinput)
 }
 \arguments{
-\item{asso.matinput}{An input is an association matrix that is estimated from
-the user-provided OTU data.}
+\item{asso.matinput}{an association matrix estimated using a specified network estimation method.}
 }
 \value{
-A vector containing network centrality of each taxa.
+A vector network measures of each taxa.
 }
 \description{
-A function to compute the network centrality (i.e. total connectivity)
-of each microbial taxa from the association matrix.
+function to compute a network property for each microbial taxa from the estimated association matrix.
 }

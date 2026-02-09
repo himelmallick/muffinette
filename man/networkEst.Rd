@@ -4,14 +4,14 @@
 \alias{networkEst}
 \title{networkEst}
 \usage{
-networkEst(X, count = FALSE, est.method, ...)
+networkEst(x, count = FALSE, estimethod = "SparCC", ...)
 }
 \arguments{
-\item{X}{abundance matrix}
+\item{x}{abundance matrix}
 
 \item{count}{logical. If TRUE, abundances are count instead of proportions. Default value: FALSE.}
 
-\item{est.method}{network estimation method. Options include "SparCC" and "SpiecEasi".}
+\item{estimethod}{network estimation method. Options include "SparCC" and "SpiecEasi". Default value: SparCC.}
 
 \item{...}{additional arguments appropriate for the network estimation method chosen.}
 }
@@ -19,5 +19,5 @@ networkEst(X, count = FALSE, est.method, ...)
 an association matrix.
 }
 \description{
-Meta-analysis of networks using a pseudo-value approach
+function to estimate network based on feature abundances.
 }
