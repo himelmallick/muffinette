@@ -7,7 +7,7 @@
 
 ### network centrality (total connectivity)
 measureNetwork <- function(asso.matinput) {
-    rowSums(asso.matinput) - diag(asso.matinput)
+    colSums(as.matrix(asso.matinput)) - diag(as.matrix(asso.matinput))
 }
 
 

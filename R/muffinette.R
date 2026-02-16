@@ -110,6 +110,7 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
     parallel::clusterExport(cl, varlist = c("networkEst", "count", "net.est.method"),
                             envir = environment())
 
+    kept_studies <- character(0)
     for(i in 1:nstudy) {
         feature_abd_list_batchcor[[i]] <- batch_corrected_abd_df[ni_starts[i]:ni_ends[i], ]
 
@@ -117,6 +118,15 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
         groupB <- which(data_meta$exposure[data_meta$study == studies[i]] == uniqueExposure[2])
         xA <- feature_abd_list_batchcor[[i]][groupA, , drop = FALSE]
         xB <- feature_abd_list_batchcor[[i]][groupB, , drop = FALSE]
+
+        if(nrow(xA) < 3 | nrow(xB) < 3) {
+            if(verbose) {
+                message(sprintf("Skipping study %s: too few samples per exposure (nA = %d, nB = %d)", studies[i], nrow(xA), nrow(xB)))
+            }
+            estimatedNet[[i]] <- NULL
+            pseudoVal_list[[i]] <- NULL
+            next
+        }
 
         estimatedNet_groupA <- networkEst(x = xA, count = count, estimethod = net.est.method, ...)
         estimatedNet_groupB <- networkEst(x = xB, count = count, estimethod = net.est.method, ...)
@@ -155,12 +165,15 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
         pseudoVal_list[[i]] <- pseudoVal
         rm(pseudoVal)
         if(verbose) {
-            cat(sprintf("Network estimated for study %d / %d", i, nstudy, "\n"))
+            cat(sprintf("Network estimated for study %d / %d\n", i, nstudy))
         }
+        kept_studies <- c(kept_studies, studies[i])
     }
 
+    pseudoVal_list <- Filter(Negate(is.null), pseudoVal_list)
     pseudoVal_abd <- do.call(rbind, pseudoVal_list) ## sample-by-feature matrix of pseudovalues
-    rownames(pseudoVal_abd) <- rownames(data_meta)
+    # rownames(pseudoVal_abd) <- rownames(data_meta)
+    data_meta_eff <- data_meta[rownames(pseudoVal_abd), , drop = FALSE]
     #########################################
 
 
@@ -170,13 +183,13 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
     fit_lmmeta <- lm_meta_muff(feature_abd = t(pseudoVal_abd),
                                    exposure = "exposure",
                                    batch = "study",
-                                   data = data_meta, control = list(forest_plot = "forest.pdf",
+                                   data = data_meta_eff, control = list(forest_plot = "forest.pdf",
                                                                     normalization = 'NONE',
                                                                     transform = 'NONE'))
     if(verbose){
         cat("Meta-analysis done...")
     }
-    metafits <- fit_lmmeta$meta_fits[order(abs(fit_lmmeta$meta_fits$qval.fdr), decreasing = FALSE), ]
+    metafits <- fit_lmmeta$meta_fits[order(abs(fit_lmmeta$meta_fits$qval), decreasing = FALSE), ]
 
     list(metafits = metafits, pseudoValues = pseudoVal_abd,
          feature_abd_list_batchcor = feature_abd_list_batchcor,
