@@ -343,6 +343,7 @@ lm_meta_muff <- function (feature_abd, batch, exposure, covariates = NULL, covar
     meta_fits <- rma_wrapper(maaslin_fits, method = control$rma_method,
                              output = control$output, forest_plot = control$forest_plot,
                              rma_conv = control$rma_conv, rma_maxit = control$rma_maxit,
+                             pvalAdjust = control$pvalAdjust, alpha_thresh = control$alpha_thresh,
                              verbose = verbose)
     return(list(meta_fits = meta_fits, maaslin_fits = maaslin_fits,
                 control = control))

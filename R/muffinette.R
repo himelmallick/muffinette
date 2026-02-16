@@ -31,7 +31,7 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
 
     metaAbd <- check_features_abd(metaAbd)
 
-    ni <- as.numeric(table(batchvar)) ## vector of sample sizes for different studies
+    ni <- as.numeric(table(factor(batchvar, levels = unique(batchvar)))) ## vector of sample sizes for different studies
     ni_ends <- cumsum(ni)
     ni_starts <- c(1, ni_ends[-length(ni)] + 1)
     if(sum(ni) != nrow(metaData)) {
@@ -67,7 +67,7 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
     if(batchCorrect) {
         meta_abd_mat <- t(as.matrix(filtered_featuretable)) ## feature-by-sample matrix
         data_meta <- data.frame(sampleID = colnames(meta_abd_mat),
-                                study = as.factor(rep(studies, ni)),
+                                study = as.factor(batchvar),
                                 exposure = exposurevar)
         rownames(data_meta) <- data_meta$sampleID
         batch_corrected_abd <- adjust_batch_muff(feature_abd = meta_abd_mat,
@@ -79,7 +79,7 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
             message("Batch correction done...")
     } else {
         data_meta <- data.frame(sampleID = rownames(filtered_featuretable),
-                                study = as.factor(rep(studies, ni)),
+                                study = as.factor(batchvar),
                                 exposure = exposurevar)
         rownames(data_meta) <- data_meta$sampleID
         batch_corrected_abd_df <- filtered_featuretable
@@ -88,10 +88,9 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
 
 
     #################################################################
-    #### Network estimation & pseudo-value calculation per study ####
+    #### Network estimation & pseudovalue calculation per study ####
     #################################################################
     feature_abd_list_batchcor <- vector("list", nstudy)
-    #feature_names_list <- vector("list", nstudy)
     pseudoVal_list <- vector("list", nstudy)
     estimatedNet <- vector("list", nstudy)
 
@@ -102,7 +101,6 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
     if(!is.null(fixseed)) {
         parallel::clusterSetRNGStream(cl, iseed = fixseed)
     }
-    #parallel::clusterEvalQ(cl, {library(SpiecEasi)})
     parallel::clusterEvalQ(cl, {
         if(!requireNamespace("SpiecEasi", quietly = TRUE)) {
             stop("Package 'SpiecEasi' is required.")
@@ -113,9 +111,7 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
                             envir = environment())
 
     for(i in 1:nstudy) {
-        #feature_abd_list_batchcor[[i]] <- batch_corrected_abd_df[rownames(feature_abd_list_filtered[[i]]), ]
         feature_abd_list_batchcor[[i]] <- batch_corrected_abd_df[ni_starts[i]:ni_ends[i], ]
-        #feature_names_list[[i]] <- colnames(feature_abd_list_batchcor[[i]])
 
         groupA <- which(data_meta$exposure[data_meta$study == studies[i]] == uniqueExposure[1])
         groupB <- which(data_meta$exposure[data_meta$study == studies[i]] == uniqueExposure[2])
@@ -130,12 +126,6 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
         thetahat_groupA <- measureNetwork(estimatedNet_groupA)
         thetahat_groupB <- measureNetwork(estimatedNet_groupB)
 
-        # cl <- parallel::makeCluster(ncores)
-        # if(!is.null(fixseed)) {
-        #     parallel::clusterSetRNGStream(cl, iseed = fixseed + i)
-        # }
-        # on.exit(parallel::stopCluster(cl), add = TRUE)
-        # parallel::clusterEvalQ(cl, {library(SpiecEasi)})
         parallel::clusterExport(cl, varlist = c("xA"),
                                 envir = environment())
 
@@ -163,10 +153,9 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
         colnames(pseudoVal) <- colnames(feature_abd_list_batchcor[[i]]) # Map the column names (feature names)
 
         pseudoVal_list[[i]] <- pseudoVal
-        #cat("Reached end of study loop i =", i, "\n")
         rm(pseudoVal)
         if(verbose) {
-            cat(sprintf("Network estimated for study %d / %d", i, nstudy))
+            cat(sprintf("Network estimated for study %d / %d", i, nstudy, "\n"))
         }
     }
 
