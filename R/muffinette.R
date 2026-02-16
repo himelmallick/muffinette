@@ -163,7 +163,7 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
         colnames(pseudoVal) <- colnames(feature_abd_list_batchcor[[i]]) # Map the column names (feature names)
 
         pseudoVal_list[[i]] <- pseudoVal
-        cat("Reached end of study loop i =", i, "\n")
+        #cat("Reached end of study loop i =", i, "\n")
         rm(pseudoVal)
         if(verbose) {
             cat(sprintf("Network estimated for study %d / %d", i, nstudy))
