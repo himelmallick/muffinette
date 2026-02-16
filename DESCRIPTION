@@ -7,6 +7,6 @@ Description: muffinette provides a consolidated framework to meta analyze differ
 License: MIT + file LICENSE
 Encoding: UTF-8
 Remotes: biobakery/MMUPHin
-Imports: caret, cowplot, ggplot2, SpiecEasi, tidyr, MMUPHin
+Imports: caret, cowplot, dplyr, ggplot2, metafor, stringr, SpiecEasi, tidyr, Maaslin2
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3

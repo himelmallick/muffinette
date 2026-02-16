@@ -178,7 +178,7 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
     #########################################
     #### Meta-analysis of pseudo-values  ####
     #########################################
-    fit_lmmeta <- MMUPHin::lm_meta(feature_abd = t(pseudoVal_abd),
+    fit_lmmeta <- lm_meta_muff(feature_abd = t(pseudoVal_abd),
                                    exposure = "exposure",
                                    batch = "study",
                                    data = data_meta, control = list(forest_plot = "forest.pdf",
