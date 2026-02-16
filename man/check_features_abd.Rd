@@ -13,5 +13,5 @@ check_features_abd(feature_abd)
 error messages if feature abundances are (1) missing, (2) negative, (3) not proportions.
 }
 \description{
-function to make sure that feature abundances are neither missing nor negative.
+function to ensure that feature abundances are neither missing nor negative.
 }

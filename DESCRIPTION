@@ -4,9 +4,9 @@ Version: 0.0.0.9000
 Author: Sreya Sarkar [aut], Himel Mallick [aut, cre]
 Maintainer: Himel Mallick <him4004@med.cornell.edu>
 Description: muffinette provides a consolidated framework to meta analyze differential network analysis for microbiome studies.
-License: MIT + LICENSE
+License: MIT + file LICENSE
 Encoding: UTF-8
 Remotes: biobakery/MMUPHin
-Imports: caret, gtools, parallel, dplyr, SpiecEasi, MMUPHin
+Imports: caret, cowplot, ggplot2, SpiecEasi, tidyr, MMUPHin
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3

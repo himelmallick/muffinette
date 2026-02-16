@@ -16,24 +16,17 @@
 #' @param covariates optional covariates for batch effect correction. Default value: NULL.
 #' @param ncores number of cores to use for parallelized leave-one-subject-out network estimation.
 #' @param verbose logical. If TRUE, print out number of iterations and computational time. Default value: TRUE.
+#' @param fixseed seed for reproducibility
 #' @param ... additional arguments passed to \code{\link{networkEst}} according to the choice specified for \code{net.est.method}.
 #' @return a list with
 #' \item{metafits}{data frame with columns as feature names, effect sizes, p-values and q-values, heterogeneity statistics.}
 #' \item{pseudoValues}{sample-by-feature matrix of pseudovalues.}
-#'
-#' @import parallel
-#' @import dplyr
-#' @import gtools
-#' @import SpiecEasi
-#' @import caret
-#' @import MMUPHin
-#' @import stats
 #' @export
 
 muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
                        filter = TRUE, abd_threshold = 0, prev_threshold = 0.1, topfeatures = NULL,
                        batchCorrect = TRUE, count, net.est.method,
-                       covariates = NULL, ncores = 4, verbose = TRUE, ...){
+                       covariates = NULL, ncores = 4, verbose = TRUE, fixseed = NULL, ...){
 
 
     metaAbd <- check_features_abd(metaAbd)
@@ -64,38 +57,32 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
     } else {
         filtered_featuretable <- t(metaAbd)
     }
-    filtered_featuretable <- filter_varfeatures(x = filtered_featuretable, topV = topfeatures)
+    filtered_featuretable <- filter_varfeatures(x = filtered_featuretable, topV = topfeatures) ## sample-by-feature data frame
     ##################################################
-
-
-    feature_abd_list_filtered <- lapply(seq_len(nstudy), function(i) {
-        filtered_featuretable[ni_starts[i]:ni_ends[i], ]
-    })
-    feature_names_list <- lapply(feature_abd_list_filtered, colnames)
 
 
     #########################################
     ############ Batch correction ###########
     #########################################
     if(batchCorrect) {
-        meta_abd_mat <- t(as.matrix(do.call(rbind, feature_abd_list_filtered))) ## feature_by_sample matrix
+        meta_abd_mat <- t(as.matrix(filtered_featuretable)) ## feature-by-sample matrix
         data_meta <- data.frame(sampleID = colnames(meta_abd_mat),
                                 study = as.factor(rep(studies, ni)),
                                 exposure = exposurevar)
         rownames(data_meta) <- data_meta$sampleID
-        batch_corrected_abd <- MMUPHin::adjust_batch(feature_abd = meta_abd_mat,
+        batch_corrected_abd <- adjust_batch_muff(feature_abd = meta_abd_mat,
                                                      batch = "study",
                                                      data = data_meta)$feature_abd_adj
-        batch_corrected_abd_df <- as.data.frame(t(batch_corrected_abd)); rm(batch_corrected_abd)
+        batch_corrected_abd_df <- as.data.frame(t(batch_corrected_abd)) ## sample-by-feature data frame
+        rm(batch_corrected_abd)
         if(verbose)
             message("Batch correction done...")
     } else {
-        meta_abd_mat <- t(as.matrix(do.call(rbind, feature_abd_list_filtered)))
-        data_meta <- data.frame(sampleID = colnames(meta_abd_mat),
+        data_meta <- data.frame(sampleID = rownames(filtered_featuretable),
                                 study = as.factor(rep(studies, ni)),
                                 exposure = exposurevar)
         rownames(data_meta) <- data_meta$sampleID
-        batch_corrected_abd_df <- as.data.frame(t(meta_abd_mat))
+        batch_corrected_abd_df <- filtered_featuretable
     }
     #########################################
 
@@ -104,29 +91,71 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
     #### Network estimation & pseudo-value calculation per study ####
     #################################################################
     feature_abd_list_batchcor <- vector("list", nstudy)
+    #feature_names_list <- vector("list", nstudy)
     pseudoVal_list <- vector("list", nstudy)
     estimatedNet <- vector("list", nstudy)
 
     uniqueExposure <- unique(exposurevar)
 
-    for(i in 1:nstudy) {
-        feature_abd_list_batchcor[[i]] <- batch_corrected_abd_df[rownames(feature_abd_list_filtered[[i]]), ]
+    cl <- parallel::makeCluster(ncores)
+    on.exit(parallel::stopCluster(cl), add = TRUE)
+    if(!is.null(fixseed)) {
+        parallel::clusterSetRNGStream(cl, iseed = fixseed)
+    }
+    #parallel::clusterEvalQ(cl, {library(SpiecEasi)})
+    parallel::clusterEvalQ(cl, {
+        if(!requireNamespace("SpiecEasi", quietly = TRUE)) {
+            stop("Package 'SpiecEasi' is required.")
+        }
+        NULL
+    })
+    parallel::clusterExport(cl, varlist = c("networkEst", "count", "net.est.method"),
+                            envir = environment())
 
-        groupA <- which(data_meta[data_meta$study == studies[i], 3] == uniqueExposure[1])
-        groupB <- which(data_meta[data_meta$study == studies[i], 3] == uniqueExposure[2])
-        estimatedNet_groupA <- networkEst(x = feature_abd_list_batchcor[[i]][groupA, ], count = count, estimethod = net.est.method, ...)
-        estimatedNet_groupB <- networkEst(x = feature_abd_list_batchcor[[i]][groupB, ], count = count, estimethod = net.est.method, ...)
+    for(i in 1:nstudy) {
+        #feature_abd_list_batchcor[[i]] <- batch_corrected_abd_df[rownames(feature_abd_list_filtered[[i]]), ]
+        feature_abd_list_batchcor[[i]] <- batch_corrected_abd_df[ni_starts[i]:ni_ends[i], ]
+        #feature_names_list[[i]] <- colnames(feature_abd_list_batchcor[[i]])
+
+        groupA <- which(data_meta$exposure[data_meta$study == studies[i]] == uniqueExposure[1])
+        groupB <- which(data_meta$exposure[data_meta$study == studies[i]] == uniqueExposure[2])
+        xA <- feature_abd_list_batchcor[[i]][groupA, , drop = FALSE]
+        xB <- feature_abd_list_batchcor[[i]][groupB, , drop = FALSE]
+
+        estimatedNet_groupA <- networkEst(x = xA, count = count, estimethod = net.est.method, ...)
+        estimatedNet_groupB <- networkEst(x = xB, count = count, estimethod = net.est.method, ...)
+        ## remove later after checking reproducibility
         estimatedNet[[i]] <- list(estimatedNet_groupA = estimatedNet_groupA, estimatedNet_groupB = estimatedNet_groupB)
+
         thetahat_groupA <- measureNetwork(estimatedNet_groupA)
-        message("DONE")
         thetahat_groupB <- measureNetwork(estimatedNet_groupB)
-        estimatedNet_drop_groupA <- parallel::mclapply(1:nrow(feature_abd_list_batchcor[[i]][groupA, ]), function(j) networkEst(x = feature_abd_list_batchcor[[i]][groupA, ][-j, ], count = count, estimethod = net.est.method, ...), mc.cores = ncores)
-        estimatedNet_drop_groupB <- parallel::mclapply(1:nrow(feature_abd_list_batchcor[[i]][groupB, ]), function(j) networkEst(x = feature_abd_list_batchcor[[i]][groupB, ][-j, ], count = count, estimethod = net.est.method, ...), mc.cores = ncores)
-        thetahat_drop_groupA <- sapply(estimatedNet_drop_groupA, measureNetwork)
-        message("DONE")
-        thetahat_drop_groupB <- sapply(estimatedNet_drop_groupB, measureNetwork)
-        pseudoVal_groupA <- pseudoValue(thetahat_groupA, thetahat_drop_groupA, nrow(feature_abd_list_batchcor[[i]][groupA, ]))
-        pseudoVal_groupB <- pseudoValue(thetahat_groupB, thetahat_drop_groupB, nrow(feature_abd_list_batchcor[[i]][groupB, ]))
+
+        # cl <- parallel::makeCluster(ncores)
+        # if(!is.null(fixseed)) {
+        #     parallel::clusterSetRNGStream(cl, iseed = fixseed + i)
+        # }
+        # on.exit(parallel::stopCluster(cl), add = TRUE)
+        # parallel::clusterEvalQ(cl, {library(SpiecEasi)})
+        parallel::clusterExport(cl, varlist = c("xA"),
+                                envir = environment())
+
+        estimatedNet_loo_groupA <- parallel::parLapply(cl, X = seq_len(nrow(xA)),
+                                                   fun = function(j) {
+                                                       tryCatch(networkEst(x = xA[-j, , drop = FALSE], count = count, estimethod = net.est.method, ...),
+                                                                error = function(e) e)
+                                                   })
+        parallel::clusterExport(cl, varlist = c("xB"),
+                                envir = environment())
+        estimatedNet_loo_groupB <- parallel::parLapply(cl, X = seq_len(nrow(xB)),
+                                                   fun = function(j) {
+                                                       tryCatch(networkEst(x = xB[-j, , drop = FALSE], count = count, estimethod = net.est.method, ...),
+                                                                error = function(e) e)
+                                                   })
+
+        thetahat_loo_groupA <- sapply(estimatedNet_loo_groupA, measureNetwork)
+        thetahat_loo_groupB <- sapply(estimatedNet_loo_groupB, measureNetwork)
+        pseudoVal_groupA <- pseudoValue(thetahat_groupA, thetahat_loo_groupA, nrow(xA))
+        pseudoVal_groupB <- pseudoValue(thetahat_groupB, thetahat_loo_groupB, nrow(xB))
         pseudoVal <- matrix(NA, nrow(feature_abd_list_batchcor[[i]]), ncol(feature_abd_list_batchcor[[i]]))
         pseudoVal[groupA, ] <- pseudoVal_groupA
         pseudoVal[groupB, ] <- pseudoVal_groupB
@@ -134,8 +163,10 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
         colnames(pseudoVal) <- colnames(feature_abd_list_batchcor[[i]]) # Map the column names (feature names)
 
         pseudoVal_list[[i]] <- pseudoVal
+        cat("Reached end of study loop i =", i, "\n")
+        rm(pseudoVal)
         if(verbose) {
-            message(sprintf("Network estimated for study %d / %d", i, nstudy))
+            cat(sprintf("Network estimated for study %d / %d", i, nstudy))
         }
     }
 
@@ -154,10 +185,12 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
                                                                     normalization = 'NONE',
                                                                     transform = 'NONE'))
     if(verbose){
-        message("Meta-analysis done...")
+        cat("Meta-analysis done...")
     }
     metafits <- fit_lmmeta$meta_fits[order(abs(fit_lmmeta$meta_fits$qval.fdr), decreasing = FALSE), ]
 
-    list(metafits = metafits, pseudoValues = pseudoVal_abd)
+    list(metafits = metafits, pseudoValues = pseudoVal_abd,
+         feature_abd_list_batchcor = feature_abd_list_batchcor,
+         estimatedNet = estimatedNet)
 
 }

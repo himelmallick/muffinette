@@ -4,7 +4,6 @@
 #' @param x a sample-by-feature data frame.
 #' @param topV number of most variable features to extract. Default is same as the number of features.
 #' @return a sample-by-feature data frame.
-#' @import caret
 #' @importFrom stats var
 #' @export
 

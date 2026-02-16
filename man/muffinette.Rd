@@ -19,6 +19,7 @@ muffinette(
   covariates = NULL,
   ncores = 4,
   verbose = TRUE,
+  fixseed = NULL,
   ...
 )
 }
@@ -50,6 +51,8 @@ muffinette(
 \item{ncores}{number of cores to use for parallelized leave-one-subject-out network estimation.}
 
 \item{verbose}{logical. If TRUE, print out number of iterations and computational time. Default value: TRUE.}
+
+\item{fixseed}{seed for reproducibility}
 
 \item{...}{additional arguments passed to \code{\link{networkEst}} according to the choice specified for \code{net.est.method}.}
 }

@@ -10,7 +10,7 @@ measureNetwork(asso.matinput)
 \item{asso.matinput}{an association matrix estimated using a specified network estimation method.}
 }
 \value{
-A vector network measures of each taxa.
+A vector of network measures of each taxa.
 }
 \description{
 function to compute a network property for each microbial taxa from the estimated association matrix.

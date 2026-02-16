@@ -7,12 +7,10 @@
 #' @param estimethod network estimation method. Options include "SparCC" and "SpiecEasi". Default value: SparCC.
 #' @param ... additional arguments appropriate for the network estimation method chosen.
 #' @return an association matrix.
-#' @import gtools
-#' @import SpiecEasi
 #' @export
 
 networkEst <- function(x, count = FALSE, estimethod = "SparCC", ...){
-    
+
     estimethod <- match.arg(estimethod,
                             choices = c("SparCC", "SpiecEasi"))
 
@@ -20,7 +18,7 @@ networkEst <- function(x, count = FALSE, estimethod = "SparCC", ...){
         estNetObj <- SpiecEasi::sparcc(data = x, ...)$Cor
     } else if(estimethod == "SpiecEasi") {
         fit <- SpiecEasi::spiec.easi(data = as.matrix(x), ...)
-        beta.mat <- as.matrix(getOptBeta(fit))
+        beta.mat <- as.matrix(SpiecEasi::getOptBeta(fit))
         adj.mat <- ((beta.mat != 0) + t(beta.mat != 0)) > 0
         estNetObj <- as.numeric(adj.mat)
         dim(estNetObj) <- dim(adj.mat)
@@ -34,7 +32,7 @@ networkEst <- function(x, count = FALSE, estimethod = "SparCC", ...){
     #   fit_select <- huge.select(est = fit, ...)
     #   estNetObj <- fit_select$opt.icov
     # }
-    
+
     estNetObj
 }
 
