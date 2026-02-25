@@ -1,4 +1,4 @@
-#' @title muffinette_batcheffLater
+#' @title muffinette
 #'
 #' @description Meta-analysis of networks using a pseudo-value approach
 #'
@@ -23,7 +23,7 @@
 #' \item{pseudoValues}{sample-by-feature matrix of pseudovalues.}
 #' @export
 
-muffinette_batcheffLater <- function(metaAbd, batchvar, exposurevar, metaData,
+muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
                        filter = TRUE, abd_threshold = 0, prev_threshold = 0.1, topfeatures = NULL,
                        batchCorrect = TRUE, count, net.est.method,
                        covariates = NULL, ncores = 4, verbose = TRUE, fixseed = NULL, ...){
@@ -61,10 +61,36 @@ muffinette_batcheffLater <- function(metaAbd, batchvar, exposurevar, metaData,
     ##################################################
 
 
+    #########################################
+    ############ Batch correction ###########
+    #########################################
+    if(batchCorrect) {
+        meta_abd_mat <- t(as.matrix(filtered_featuretable)) ## feature-by-sample matrix
+        data_meta <- data.frame(sampleID = colnames(meta_abd_mat),
+                                study = as.factor(batchvar),
+                                exposure = exposurevar)
+        rownames(data_meta) <- data_meta$sampleID
+        batch_corrected_abd <- adjust_batch_muff(feature_abd = meta_abd_mat,
+                                                     batch = "study",
+                                                     data = data_meta)$feature_abd_adj
+        batch_corrected_abd_df <- as.data.frame(t(batch_corrected_abd)) ## sample-by-feature data frame
+        rm(batch_corrected_abd)
+        if(verbose)
+            message("Batch correction done...")
+    } else {
+        data_meta <- data.frame(sampleID = rownames(filtered_featuretable),
+                                study = as.factor(batchvar),
+                                exposure = exposurevar)
+        rownames(data_meta) <- data_meta$sampleID
+        batch_corrected_abd_df <- filtered_featuretable
+    }
+    #########################################
+
+
     #################################################################
     #### Network estimation & pseudovalue calculation per study ####
     #################################################################
-    feature_abd_list <- vector("list", nstudy)
+    feature_abd_list_batchcor <- vector("list", nstudy)
     pseudoVal_list <- vector("list", nstudy)
     estimatedNet <- vector("list", nstudy)
 
@@ -83,17 +109,15 @@ muffinette_batcheffLater <- function(metaAbd, batchvar, exposurevar, metaData,
     })
     parallel::clusterExport(cl, varlist = c("networkEst", "count", "net.est.method"),
                             envir = environment())
-    data_meta <- data.frame(study = as.factor(batchvar),
-                            exposure = exposurevar)
 
     kept_studies <- character(0)
     for(i in 1:nstudy) {
-        feature_abd_list[[i]] <- filtered_featuretable[ni_starts[i]:ni_ends[i], ]
+        feature_abd_list_batchcor[[i]] <- batch_corrected_abd_df[ni_starts[i]:ni_ends[i], ]
 
         groupA <- which(data_meta$exposure[data_meta$study == studies[i]] == uniqueExposure[1])
         groupB <- which(data_meta$exposure[data_meta$study == studies[i]] == uniqueExposure[2])
-        xA <- feature_abd_list[[i]][groupA, , drop = FALSE]
-        xB <- feature_abd_list[[i]][groupB, , drop = FALSE]
+        xA <- feature_abd_list_batchcor[[i]][groupA, , drop = FALSE]
+        xB <- feature_abd_list_batchcor[[i]][groupB, , drop = FALSE]
 
         if(nrow(xA) < 5 | nrow(xB) < 5) {
             if(verbose) {
@@ -132,11 +156,11 @@ muffinette_batcheffLater <- function(metaAbd, batchvar, exposurevar, metaData,
         thetahat_loo_groupB <- sapply(estimatedNet_loo_groupB, measureNetwork)
         pseudoVal_groupA <- pseudoValue(thetahat_groupA, thetahat_loo_groupA, nrow(xA))
         pseudoVal_groupB <- pseudoValue(thetahat_groupB, thetahat_loo_groupB, nrow(xB))
-        pseudoVal <- matrix(NA, nrow(feature_abd_list[[i]]), ncol(feature_abd_list[[i]]))
+        pseudoVal <- matrix(NA, nrow(feature_abd_list_batchcor[[i]]), ncol(feature_abd_list_batchcor[[i]]))
         pseudoVal[groupA, ] <- pseudoVal_groupA
         pseudoVal[groupB, ] <- pseudoVal_groupB
         pseudoVal <- scale(pseudoVal, center = TRUE, scale = TRUE)
-        colnames(pseudoVal) <- colnames(feature_abd_list[[i]]) # Map the column names (feature names)
+        colnames(pseudoVal) <- colnames(feature_abd_list_batchcor[[i]]) # Map the column names (feature names)
 
         pseudoVal_list[[i]] <- pseudoVal
         rm(pseudoVal)
@@ -148,40 +172,19 @@ muffinette_batcheffLater <- function(metaAbd, batchvar, exposurevar, metaData,
 
     pseudoVal_list <- Filter(Negate(is.null), pseudoVal_list)
     pseudoVal_abd <- do.call(rbind, pseudoVal_list) ## sample-by-feature matrix of pseudovalues
-    # rownames(pseudoVal_abd) <- rownames(data_meta)
+    rownames(pseudoVal_abd) <- rownames(data_meta)
     # data_meta_eff <- data_meta[rownames(pseudoVal_abd), , drop = FALSE]
-    #########################################
-    
-    
-    ####################################################
-    ############ Batch correction of pseudovalues ###########
-    ####################################################
-    #if(batchCorrect) {
-        meta_abd_mat <- t(pseudoVal_abd) ## feature-by-sample matrix
-        data_meta$sampleID <- colnames(meta_abd_mat)
-        rownames(data_meta) <- data_meta$sampleID
-        batch_corrected_abd <- adjust_batch_muff(feature_abd = meta_abd_mat,
-                                                 batch = "study",
-                                                 data = data_meta)$feature_abd_adj
-        if(verbose)
-            message("Batch correction done...")
-    #} #else {
-    #     data_meta <- data.frame(sampleID = rownames(filtered_featuretable),
-    #                             study = as.factor(batchvar),
-    #                             exposure = exposurevar)
-    #     rownames(data_meta) <- data_meta$sampleID
-    #     batch_corrected_abd_df <- filtered_featuretable
-    # }
     #########################################
 
 
     #########################################
     #### Meta-analysis of pseudo-values  ####
     #########################################
-    fit_lmmeta <- lm_meta_muff(feature_abd = batch_corrected_abd,
+    fit_lmmeta <- lm_meta_muff(feature_abd = t(pseudoVal_abd),
                                    exposure = "exposure",
                                    batch = "study",
-                                   data = data_meta, control = list(forest_plot = "forest.pdf",
+                                   data = data_meta, control = list(output = getwd(),
+                                                                    forest_plot = "forest.pdf",
                                                                     normalization = 'NONE',
                                                                     transform = 'NONE'))
     if(verbose){
@@ -190,7 +193,7 @@ muffinette_batcheffLater <- function(metaAbd, batchvar, exposurevar, metaData,
     metafits <- fit_lmmeta$meta_fits[order(abs(fit_lmmeta$meta_fits$qval), decreasing = FALSE), ]
 
     list(metafits = metafits, pseudoValues = pseudoVal_abd,
-         batch_corrected_pseudoValues = batch_corrected_abd,
+         feature_abd_list_batchcor = feature_abd_list_batchcor,
          estimatedNet = estimatedNet)
 
 }
