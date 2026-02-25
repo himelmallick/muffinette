@@ -28,6 +28,11 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
                        batchCorrect = TRUE, count, net.est.method,
                        covariates = NULL, ncores = 4, verbose = TRUE, fixseed = NULL, ...){
 
+    if(!is.null(fixseed)) {
+        RNGkind("L'Ecuyer-CMRG")
+        set.seed(fixseed)
+    }
+
 
     metaAbd <- check_features_abd(metaAbd)
 
@@ -99,8 +104,22 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
     cl <- parallel::makeCluster(ncores)
     on.exit(parallel::stopCluster(cl), add = TRUE)
     if(!is.null(fixseed)) {
+        # ensure master uses reproducible parallel RNG
+        RNGkind("L'Ecuyer-CMRG")
+        set.seed(fixseed)
+
+        # ensure workers use same RNG engine
+        parallel::clusterEvalQ(cl, {
+            RNGkind("L'Ecuyer-CMRG")
+            NULL
+        })
+
+        # generate independent streams for workers
         parallel::clusterSetRNGStream(cl, iseed = fixseed)
     }
+    # if(!is.null(fixseed)) {
+    #     parallel::clusterSetRNGStream(cl, iseed = fixseed)
+    # }
     parallel::clusterEvalQ(cl, {
         if(!requireNamespace("SpiecEasi", quietly = TRUE)) {
             stop("Package 'SpiecEasi' is required.")
