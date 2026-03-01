@@ -59,10 +59,10 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
         }
         filtered_featuretable <- filter_abdfeatures(x = t(metaAbd), abd_threshold = abd_threshold,
                                                     prev_threshold = prev_threshold)
+        filtered_featuretable <- filter_varfeatures(x = filtered_featuretable, topV = topfeatures) ## sample-by-feature data frame
     } else {
         filtered_featuretable <- t(metaAbd)
     }
-    filtered_featuretable <- filter_varfeatures(x = filtered_featuretable, topV = topfeatures) ## sample-by-feature data frame
     ##################################################
 
 
