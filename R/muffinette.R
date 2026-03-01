@@ -15,6 +15,7 @@
 #' @param net.est.method method for network estimation. Default value: "SparCC".
 #' @param covariates optional covariates for batch effect correction. Default value: NULL.
 #' @param ncores number of cores to use for parallelized leave-one-subject-out network estimation.
+#' @param analysismethod method of meta-analysis.
 #' @param verbose logical. If TRUE, print out number of iterations and computational time. Default value: TRUE.
 #' @param fixseed seed for reproducibility
 #' @param ... additional arguments passed to \code{\link{networkEst}} according to the choice specified for \code{net.est.method}.
@@ -26,7 +27,7 @@
 muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
                        filter = TRUE, abd_threshold = 0, prev_threshold = 0.1, topfeatures = NULL,
                        batchCorrect = TRUE, count, net.est.method,
-                       covariates = NULL, ncores = 4, verbose = TRUE, fixseed = NULL, ...){
+                       covariates = NULL, ncores = 4, analysismethod = 'LM', verbose = TRUE, fixseed = NULL, ...){
 
     if(!is.null(fixseed)) {
         RNGkind("L'Ecuyer-CMRG")
@@ -203,6 +204,7 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
                                    exposure = "exposure",
                                    batch = "study",
                                    data = data_meta, control = list(output = getwd(),
+                                                                    analysis_method = analysismethod,
                                                                     forest_plot = "forest.pdf",
                                                                     normalization = 'NONE',
                                                                     transform = 'NONE'))

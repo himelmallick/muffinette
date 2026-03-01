@@ -18,6 +18,7 @@ muffinette(
   net.est.method,
   covariates = NULL,
   ncores = 4,
+  analysismethod = "LM",
   verbose = TRUE,
   fixseed = NULL,
   ...
@@ -49,6 +50,8 @@ muffinette(
 \item{covariates}{optional covariates for batch effect correction. Default value: NULL.}
 
 \item{ncores}{number of cores to use for parallelized leave-one-subject-out network estimation.}
+
+\item{analysismethod}{method of meta-analysis.}
 
 \item{verbose}{logical. If TRUE, print out number of iterations and computational time. Default value: TRUE.}
 
