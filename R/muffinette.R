@@ -77,8 +77,9 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
                                 exposure = exposurevar)
         rownames(data_meta) <- data_meta$sampleID
         batch_corrected_abd <- adjust_batch_muff(feature_abd = meta_abd_mat,
-                                                     batch = "study",
-                                                     data = data_meta)$feature_abd_adj
+                                                 batch = "study",
+                                                 covariates = "exposure",
+                                                 data = data_meta)$feature_abd_adj
         batch_corrected_abd_df <- as.data.frame(t(batch_corrected_abd)) ## sample-by-feature data frame
         rm(batch_corrected_abd)
         if(verbose)
@@ -118,9 +119,6 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
         # generate independent streams for workers
         parallel::clusterSetRNGStream(cl, iseed = fixseed)
     }
-    # if(!is.null(fixseed)) {
-    #     parallel::clusterSetRNGStream(cl, iseed = fixseed)
-    # }
     parallel::clusterEvalQ(cl, {
         if(!requireNamespace("SpiecEasi", quietly = TRUE)) {
             stop("Package 'SpiecEasi' is required.")
