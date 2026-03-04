@@ -22,6 +22,16 @@ the following command:
 
 ## Example Implementation
 
+We showcase the effectiveness of our network-connectivity-based
+meta-analytic approach (muffinette) by drawing a comparison with
+feature-abundance-based meta-analysis (MMUPHin) based on the CRC data
+available through the R package `MMUPHin`. This data consists of species
+level relative abundance profiles of CRC and control patients in the
+five public studies used in Thomas et al. (2019). The dataset is sourced
+from the R package `curatedMetagenomicData`.
+
+### Data Pre-processing
+
     rm(list=ls())
     library(dplyr)
     ## 
@@ -71,6 +81,8 @@ the following command:
 
     meta_abd_mat <- t(as.matrix(filtered_featuretable)) ## feature-by-sample matrix
 
+### Batch (Study) Effect Correction
+
     batch_corrected_abd <- MMUPHin::adjust_batch(feature_abd = meta_abd_mat,
                                                  batch = "study",
                                                  covariates = "response",
@@ -84,6 +96,8 @@ the following command:
     ## Estimating batch difference parameters and EB priors
     ## Performing shrinkage adjustments on batch difference parameters
     ## Performing batch corrections
+
+### Visualization of Batch (Study) Effect Correction
 
     D_before <- vegan::vegdist(t(meta_abd_mat))
     D_after <- vegan::vegdist(t(batch_corrected_abd))
@@ -166,7 +180,9 @@ the following command:
     p <- plot_grid(p_before, p_after, ncol = 2)
     p
 
-![](README_files/figure-markdown_strict/batch-correction-1.png)
+![](README_files/figure-markdown_strict/visualize-batch-correction-1.png)
+
+### Meta-analysis of feature abundance data (MMUPHin)
 
     out_mmuphin <- MMUPHin::lm_meta(feature_abd = batch_corrected_abd,
                                 exposure = "response",
@@ -188,6 +204,8 @@ the following command:
     selected_features_mmuphin
     ## [1] "s__Ruminococcus_torques"               
     ## [2] "s__Lachnospiraceae_bacterium_7_1_58FAA"
+
+### Meta-network-analysis (muffinette)
 
     batchvar <- data_meta$study
     exposurevar <- data_meta$response
@@ -245,13 +263,15 @@ the following command:
     ## [10] "s__Bacteroides_coprocola"            
     ## [11] "s__Methanobrevibacter_smithii"
 
+### Comparison of the Two Meta-Analysis Approaches
+
     fig_mmuphin <- metafits_mmuphin %>%
       filter(qval.fdr < 0.05) %>%
       mutate(feature = sub("^species:", "", feature)) %>%
       arrange(coef) %>% 
       mutate(feature = factor(feature, levels = feature)) %>%
       ggplot(aes(y = coef, x = feature)) +
-      geom_bar(stat = "identity") +
+      geom_bar(stat = "identity", fill = "lightpink") +
       coord_flip() +
       theme(axis.text.y = element_text(size = 6)) +
       labs(y = NULL, x = NULL,
@@ -261,14 +281,14 @@ the following command:
       filter(qval < 0.05) %>%
       mutate(feature = sub("^species:", "", feature)) %>%
       ggplot(aes(y = coef, x = reorder(feature, coef))) +
-      geom_bar(stat = "identity") +
+      geom_bar(stat = "identity", fill = "lightpink") +
       coord_flip() +
       theme(axis.text.y = element_text(size = 5)) +
       labs(y = NULL, x = NULL, title = "muffinette")
 
     fig <- ggarrange(fig_mmuphin, fig_muffinette, nrow = 2, heights = c(0.75, 1))
     fig <- annotate_figure(fig,
-                           left = text_grob("Differentially Abundant Features",
+                           left = text_grob("Differentially Abundant Species",
                                             size = 8, face = "bold", rot = 90),
                            bottom = text_grob("Estimated Coefficients",
                                               size = 8, hjust = 0.5, face = "bold"))
