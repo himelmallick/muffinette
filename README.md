@@ -1,7 +1,7 @@
 # muffinette - Meta-analysis of networks in microbiome studies
 
 The repository houses the **`muffinette`** R package for multi-study
-meta-analysis of microbial network properties.
+meta-analysis of multi-omics differential netwirks.
 
 ## Dependencies
 
