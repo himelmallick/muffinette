@@ -1,7 +1,7 @@
 # muffinette - Meta-analysis of differential multi-omics networks
 
 The repository houses the **`muffinette`** R package for multi-study
-meta-analysis of multi-omics differential netwirks.
+meta-analysis of multi-omics differential networks.
 
 ## Dependencies
 
@@ -14,8 +14,7 @@ which can be done as follows (execute from within a fresh R session):
 
 ## Installation
 
-Once the dependencies are installed, `muffinette` can be loaded using
-the following command:
+Once the dependencies are installed, `muffinette` can be loaded using the following command:
 
     devtools::install_github("himelmallick/muffinette", quiet = TRUE)
     library(muffinette)
@@ -24,8 +23,8 @@ the following command:
 
 We showcase the effectiveness of our network-connectivity-based
 meta-analytic approach (muffinette) by drawing a comparison with
-feature-abundance-based meta-analysis (MMUPHin) based on the CRC data
-available through the R package `MMUPHin`. This data consists of species
+feature-abundance-based meta-analysis (MMUPHin) based on a collection of microbiome 
+datasets available through the R package `MMUPHin`. This data consists of species
 level relative abundance profiles of CRC and control patients in the
 five public studies used in Thomas et al. (2019). The dataset is sourced
 from the R package `curatedMetagenomicData`.
