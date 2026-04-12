@@ -1,0 +1,144 @@
+2026-04-12 16:54:44.543968 INFO::Writing function arguments to log file
+2026-04-12 16:54:44.544384 DEBUG::Function arguments
+2026-04-12 16:54:44.544549 DEBUG::Output folder: /Users/sreyasarkar/RProjects/muffinette/HanniganGD_2017.metaphlan_bugs_list.stool
+2026-04-12 16:54:44.544701 DEBUG::Min Abundance: 0.000000
+2026-04-12 16:54:44.544842 DEBUG::Min Prevalence: 0.000000
+2026-04-12 16:54:44.544978 DEBUG::Normalization: NONE
+2026-04-12 16:54:44.545111 DEBUG::Transform: NONE
+2026-04-12 16:54:44.545245 DEBUG::Analysis method: LM
+2026-04-12 16:54:44.545372 DEBUG::Max significance: 1.000000
+2026-04-12 16:54:44.545516 DEBUG::Random effects:
+2026-04-12 16:54:44.545643 DEBUG::Fixed effects: E1
+2026-04-12 16:54:44.545771 DEBUG::Correction method: BH
+2026-04-12 16:54:44.5459 DEBUG::Standardize: FALSE
+2026-04-12 16:54:44.546024 DEBUG::Cores: 1
+2026-04-12 16:54:44.546148 INFO::Verifying options selected are valid
+2026-04-12 16:54:44.546414 INFO::Determining format of input files
+2026-04-12 16:54:44.546691 INFO::Input format is data samples as columns and metadata samples as rows
+2026-04-12 16:54:44.547255 DEBUG::Transformed data so samples are rows
+2026-04-12 16:54:44.547515 DEBUG::A total of 55 samples were found in both the data and metadata
+2026-04-12 16:54:44.547641 DEBUG::Reordering data/metadata to use same sample ordering
+2026-04-12 16:54:44.548205 INFO::Formula for fixed effects: expr ~  E1
+2026-04-12 16:54:44.548491 INFO::Factor detected for categorial metadata 'E1'. Provide a reference argument or manually set factor ordering to change reference level.
+2026-04-12 16:54:44.54872 INFO::Filter data based on min abundance and min prevalence
+2026-04-12 16:54:44.548959 INFO::Total samples in data: 55
+2026-04-12 16:54:44.549192 INFO::Min samples required with min abundance for a feature not to be filtered: 0.000000
+2026-04-12 16:54:44.549972 INFO::Total filtered features: 0
+2026-04-12 16:54:44.550237 INFO::Filtered feature names from abundance and prevalence filtering:
+2026-04-12 16:54:44.551208 INFO::Total filtered features with variance filtering: 0
+2026-04-12 16:54:44.551489 INFO::Filtered feature names from variance filtering:
+2026-04-12 16:54:44.551714 INFO::Running selected normalization method: NONE
+2026-04-12 16:54:44.551929 INFO::Bypass z-score application to metadata
+2026-04-12 16:54:44.552147 INFO::Running selected transform method: NONE
+2026-04-12 16:54:44.552364 INFO::Running selected analysis method: LM
+2026-04-12 16:54:44.552616 INFO::Fitting model to feature number 1, T1
+2026-04-12 16:54:44.55376 INFO::Fitting model to feature number 2, T2
+2026-04-12 16:54:44.554782 INFO::Fitting model to feature number 3, T3
+2026-04-12 16:54:44.555779 INFO::Fitting model to feature number 4, T4
+2026-04-12 16:54:44.55676 INFO::Fitting model to feature number 5, T5
+2026-04-12 16:54:44.557743 INFO::Fitting model to feature number 6, T6
+2026-04-12 16:54:44.558721 INFO::Fitting model to feature number 7, T7
+2026-04-12 16:54:44.559697 INFO::Fitting model to feature number 8, T8
+2026-04-12 16:54:44.560686 INFO::Fitting model to feature number 9, T9
+2026-04-12 16:54:44.561702 INFO::Fitting model to feature number 10, T10
+2026-04-12 16:54:44.562698 INFO::Fitting model to feature number 11, T11
+2026-04-12 16:54:44.563684 INFO::Fitting model to feature number 12, T12
+2026-04-12 16:54:44.56467 INFO::Fitting model to feature number 13, T13
+2026-04-12 16:54:44.565655 INFO::Fitting model to feature number 14, T14
+2026-04-12 16:54:44.566634 INFO::Fitting model to feature number 15, T15
+2026-04-12 16:54:44.567603 INFO::Fitting model to feature number 16, T16
+2026-04-12 16:54:44.568587 INFO::Fitting model to feature number 17, T17
+2026-04-12 16:54:44.569566 INFO::Fitting model to feature number 18, T18
+2026-04-12 16:54:44.570553 INFO::Fitting model to feature number 19, T19
+2026-04-12 16:54:44.571532 INFO::Fitting model to feature number 20, T20
+2026-04-12 16:54:44.572507 INFO::Fitting model to feature number 21, T21
+2026-04-12 16:54:44.573486 INFO::Fitting model to feature number 22, T22
+2026-04-12 16:54:44.574514 INFO::Fitting model to feature number 23, T23
+2026-04-12 16:54:44.575609 INFO::Fitting model to feature number 24, T24
+2026-04-12 16:54:44.588356 INFO::Fitting model to feature number 25, T25
+2026-04-12 16:54:44.58959 INFO::Fitting model to feature number 26, T26
+2026-04-12 16:54:44.590544 INFO::Fitting model to feature number 27, T27
+2026-04-12 16:54:44.591469 INFO::Fitting model to feature number 28, T28
+2026-04-12 16:54:44.592397 INFO::Fitting model to feature number 29, T29
+2026-04-12 16:54:44.593315 INFO::Fitting model to feature number 30, T30
+2026-04-12 16:54:44.594237 INFO::Fitting model to feature number 31, T31
+2026-04-12 16:54:44.595224 INFO::Fitting model to feature number 32, T32
+2026-04-12 16:54:44.596222 INFO::Fitting model to feature number 33, T33
+2026-04-12 16:54:44.597264 INFO::Fitting model to feature number 34, T34
+2026-04-12 16:54:44.598224 INFO::Fitting model to feature number 35, T35
+2026-04-12 16:54:44.599173 INFO::Fitting model to feature number 36, T36
+2026-04-12 16:54:44.600147 INFO::Fitting model to feature number 37, T37
+2026-04-12 16:54:44.601098 INFO::Fitting model to feature number 38, T38
+2026-04-12 16:54:44.602038 INFO::Fitting model to feature number 39, T39
+2026-04-12 16:54:44.602982 INFO::Fitting model to feature number 40, T40
+2026-04-12 16:54:44.603907 INFO::Fitting model to feature number 41, T41
+2026-04-12 16:54:44.604849 INFO::Fitting model to feature number 42, T42
+2026-04-12 16:54:44.605775 INFO::Fitting model to feature number 43, T43
+2026-04-12 16:54:44.606709 INFO::Fitting model to feature number 44, T44
+2026-04-12 16:54:44.607633 INFO::Fitting model to feature number 45, T45
+2026-04-12 16:54:44.608581 INFO::Fitting model to feature number 46, T46
+2026-04-12 16:54:44.609577 INFO::Fitting model to feature number 47, T47
+2026-04-12 16:54:44.610539 INFO::Fitting model to feature number 48, T48
+2026-04-12 16:54:44.61157 INFO::Fitting model to feature number 49, T49
+2026-04-12 16:54:44.612791 INFO::Fitting model to feature number 50, T50
+2026-04-12 16:54:44.613812 INFO::Fitting model to feature number 51, T51
+2026-04-12 16:54:44.614766 INFO::Fitting model to feature number 52, T52
+2026-04-12 16:54:44.615699 INFO::Fitting model to feature number 53, T53
+2026-04-12 16:54:44.616658 INFO::Fitting model to feature number 54, T54
+2026-04-12 16:54:44.617617 INFO::Fitting model to feature number 55, T55
+2026-04-12 16:54:44.618634 INFO::Fitting model to feature number 56, T56
+2026-04-12 16:54:44.619607 INFO::Fitting model to feature number 57, T57
+2026-04-12 16:54:44.620565 INFO::Fitting model to feature number 58, T58
+2026-04-12 16:54:44.621508 INFO::Fitting model to feature number 59, T59
+2026-04-12 16:54:44.622455 INFO::Fitting model to feature number 60, T60
+2026-04-12 16:54:44.623396 INFO::Fitting model to feature number 61, T61
+2026-04-12 16:54:44.624336 INFO::Fitting model to feature number 62, T62
+2026-04-12 16:54:44.62526 INFO::Fitting model to feature number 63, T63
+2026-04-12 16:54:44.626197 INFO::Fitting model to feature number 64, T64
+2026-04-12 16:54:44.627141 INFO::Fitting model to feature number 65, T65
+2026-04-12 16:54:44.628094 INFO::Fitting model to feature number 66, T66
+2026-04-12 16:54:44.629103 INFO::Fitting model to feature number 67, T67
+2026-04-12 16:54:44.630054 INFO::Fitting model to feature number 68, T68
+2026-04-12 16:54:44.631019 INFO::Fitting model to feature number 69, T69
+2026-04-12 16:54:44.631959 INFO::Fitting model to feature number 70, T70
+2026-04-12 16:54:44.632893 INFO::Fitting model to feature number 71, T71
+2026-04-12 16:54:44.633844 INFO::Fitting model to feature number 72, T72
+2026-04-12 16:54:44.634778 INFO::Fitting model to feature number 73, T73
+2026-04-12 16:54:44.635726 INFO::Fitting model to feature number 74, T74
+2026-04-12 16:54:44.636655 INFO::Fitting model to feature number 75, T75
+2026-04-12 16:54:44.637594 INFO::Fitting model to feature number 76, T76
+2026-04-12 16:54:44.638524 INFO::Fitting model to feature number 77, T77
+2026-04-12 16:54:44.639462 INFO::Fitting model to feature number 78, T78
+2026-04-12 16:54:44.640395 INFO::Fitting model to feature number 79, T79
+2026-04-12 16:54:44.64138 INFO::Fitting model to feature number 80, T80
+2026-04-12 16:54:44.642326 INFO::Fitting model to feature number 81, T81
+2026-04-12 16:54:44.643265 INFO::Fitting model to feature number 82, T82
+2026-04-12 16:54:44.644205 INFO::Fitting model to feature number 83, T83
+2026-04-12 16:54:44.645201 INFO::Fitting model to feature number 84, T84
+2026-04-12 16:54:44.646169 INFO::Fitting model to feature number 85, T85
+2026-04-12 16:54:44.647146 INFO::Fitting model to feature number 86, T86
+2026-04-12 16:54:44.648094 INFO::Fitting model to feature number 87, T87
+2026-04-12 16:54:44.649029 INFO::Fitting model to feature number 88, T88
+2026-04-12 16:54:44.649987 INFO::Fitting model to feature number 89, T89
+2026-04-12 16:54:44.650927 INFO::Fitting model to feature number 90, T90
+2026-04-12 16:54:44.651876 INFO::Fitting model to feature number 91, T91
+2026-04-12 16:54:44.652814 INFO::Fitting model to feature number 92, T92
+2026-04-12 16:54:44.653751 INFO::Fitting model to feature number 93, T93
+2026-04-12 16:54:44.654696 INFO::Fitting model to feature number 94, T94
+2026-04-12 16:54:44.655644 INFO::Fitting model to feature number 95, T95
+2026-04-12 16:54:44.656578 INFO::Fitting model to feature number 96, T96
+2026-04-12 16:54:44.65748 INFO::Fitting model to feature number 97, T97
+2026-04-12 16:54:44.658398 INFO::Fitting model to feature number 98, T98
+2026-04-12 16:54:44.659304 INFO::Fitting model to feature number 99, T99
+2026-04-12 16:54:44.660208 INFO::Fitting model to feature number 100, T100
+2026-04-12 16:54:44.665846 INFO::Counting total values for each feature
+2026-04-12 16:54:44.667874 INFO::Writing filtered data to file /Users/sreyasarkar/RProjects/muffinette/HanniganGD_2017.metaphlan_bugs_list.stool/features/filtered_data.tsv
+2026-04-12 16:54:44.671871 INFO::Writing filtered, normalized data to file /Users/sreyasarkar/RProjects/muffinette/HanniganGD_2017.metaphlan_bugs_list.stool/features/filtered_data_norm.tsv
+2026-04-12 16:54:44.675963 INFO::Writing filtered, normalized, transformed data to file /Users/sreyasarkar/RProjects/muffinette/HanniganGD_2017.metaphlan_bugs_list.stool/features/filtered_data_norm_transformed.tsv
+2026-04-12 16:54:44.68005 WARNING::Deleting existing residuals file: /Users/sreyasarkar/RProjects/muffinette/HanniganGD_2017.metaphlan_bugs_list.stool/fits/residuals.rds
+2026-04-12 16:54:44.680603 INFO::Writing residuals to file /Users/sreyasarkar/RProjects/muffinette/HanniganGD_2017.metaphlan_bugs_list.stool/fits/residuals.rds
+2026-04-12 16:54:44.682151 WARNING::Deleting existing fitted file: /Users/sreyasarkar/RProjects/muffinette/HanniganGD_2017.metaphlan_bugs_list.stool/fits/fitted.rds
+2026-04-12 16:54:44.6826 INFO::Writing fitted values to file /Users/sreyasarkar/RProjects/muffinette/HanniganGD_2017.metaphlan_bugs_list.stool/fits/fitted.rds
+2026-04-12 16:54:44.683154 INFO::Writing all results to file (ordered by increasing q-values): /Users/sreyasarkar/RProjects/muffinette/HanniganGD_2017.metaphlan_bugs_list.stool/all_results.tsv
+2026-04-12 16:54:44.684281 INFO::Writing the significant results (those which are less than or equal to the threshold of 1.000000 ) to file (ordered by increasing q-values): /Users/sreyasarkar/RProjects/muffinette/HanniganGD_2017.metaphlan_bugs_list.stool/significant_results.tsv
+2026-04-12 16:54:44.688154 WARNING::Input is a matrix, passing through as.data.frame() .
