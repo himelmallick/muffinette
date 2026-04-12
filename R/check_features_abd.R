@@ -14,9 +14,9 @@ check_features_abd <- function(feature_abd) {
         stop("Feature abundances cannot be negative!")
     }
 
-    if(!all(feature_abd_cleaned <= 1)) {
-        stop("Feature abundances must be proportions!")
-    }
+    # if(!all(feature_abd_cleaned <= 1)) {
+    #     stop("Feature abundances must be proportions!")
+    # }
 
     feature_abd_cleaned
 }

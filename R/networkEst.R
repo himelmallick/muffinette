@@ -3,16 +3,16 @@
 #' @description function to estimate network based on feature abundances.
 #'
 #' @param x abundance matrix
-#' @param count logical. If TRUE, abundances are count instead of proportions. Default value: FALSE.
+#' @param comp logical. If FALSE, the abundances are non-compositional. Default value: TRUE.
 #' @param estimethod network estimation method. Options include "SparCC" and "SpiecEasi". Default value: SparCC.
 #' @param ... additional arguments appropriate for the network estimation method chosen.
 #' @return an association matrix.
 #' @export
 
-networkEst <- function(x, count = FALSE, estimethod = "SparCC", ...){
+networkEst <- function(x, comp = TRUE, estimethod = "SparCC", ...){
 
     estimethod <- match.arg(estimethod,
-                            choices = c("SparCC", "SpiecEasi"))
+                            choices = c("SparCC", "SpiecEasi", "glasso"))
 
     if(estimethod == "SparCC") {
         estNetObj <- SpiecEasi::sparcc(data = x, ...)$Cor
@@ -24,14 +24,26 @@ networkEst <- function(x, count = FALSE, estimethod = "SparCC", ...){
         dim(estNetObj) <- dim(adj.mat)
     }
 
+    extra_args <- list(...)
+
     ### Implement GLasso method ###
-    # if(estimethod == "glasso"){
-    #   x <- as.matrix(x)
-    #   lambda_seq <- exp(seq(log(1), log(0.01), length.out = 50))
-    #   fit <- huge(x = x, method = method, lambda = lambda_seq)
-    #   fit_select <- huge.select(est = fit, ...)
-    #   estNetObj <- fit_select$opt.icov
-    # }
+    if(estimethod == "glasso"){
+      x <- as.matrix(x)
+
+      huge_args <- extra_args$huge
+      select_args <- extra_args$huge.select
+
+      if (is.null(huge_args)) huge_args <- list()
+      if (is.null(select_args)) select_args <- list()
+
+      if (is.null(huge_args$lambda)) {
+          huge_args$lambda <- exp(seq(log(1), log(0.01), length.out = 25))
+      }
+
+      fit <- do.call(huge::huge, c(list(x = x), huge_args))
+      fit_select <- do.call(huge::huge.select, c(list(est = fit), select_args))
+      estNetObj <- fit_select$opt.icov
+    }
 
     estNetObj
 }

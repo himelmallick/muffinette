@@ -6,7 +6,21 @@ Maintainer: Himel Mallick <him4004@med.cornell.edu>
 Description: muffinette provides a consolidated framework to meta analyze differential network analysis for microbiome studies.
 License: MIT + file LICENSE
 Encoding: UTF-8
-Imports: caret, cowplot, dplyr, ggplot2, metafor, stringr, SpiecEasi, tidyr, Maaslin2
-Remotes: bioc::Maaslin2
+Imports:
+	caret,
+	cowplot,
+	dplyr,
+	ggplot2,
+	huge,
+	metafor,
+	Maaslin2,
+	stringr,
+	SpiecEasi,
+	sva,
+	tidyr,
+	utils
+Remotes:
+	bioc::Maaslin2,
+	bioc::sva
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3

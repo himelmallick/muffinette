@@ -1,4 +1,4 @@
-#' @title muffinette
+#' @title muffinette_group
 #'
 #' @description Meta-analysis of networks using a pseudo-value approach
 #'
@@ -48,13 +48,11 @@
 #'
 #' Any unspecified arguments fall back to their default values.
 #' @return a list with
-#' \item{metafits}{data frame with columns as feature names, effect sizes, p-values and q-values, heterogeneity statistics; returned only when there are multiple studies.}
+#' \item{metafits}{data frame with columns as feature names, effect sizes, p-values and q-values, heterogeneity statistics.}
 #' \item{pseudoValues}{sample-by-feature matrix of pseudovalues.}
-#' \item{pseudoValues_batchCtd}{sample-by-feature matrix of batch-corrected pseudovalues, in presence of multiple studies.}
-#' \item{estimatedNet}{the estimated network based on all the subjects; returned only when \code{returm_net} is TRUE.}
 #' @export
 
-muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
+muffinette_group <- function(metaAbd, batchvar, exposurevar, metaData,
                        filter = TRUE, abd_threshold = 0, prev_threshold = 0.1, topfeatures = NULL,
                        batchCorrect = TRUE, comp = TRUE, net.est.method = "SparCC",
                        covariates = NULL, ncores = 4, verbose = TRUE, fixseed = NULL, control = NULL){
@@ -74,6 +72,10 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
     metaAbd <- check_features_abd(metaAbd)
 
     ni <- as.numeric(table(factor(batchvar, levels = unique(batchvar)))) ## vector of sample sizes for different studies
+    # if(any(ni < 10)) {
+    #     message("Fewer than 10 observations: Dropping study ", which(ni < 10))
+    #     ni <- ni[ni >= 10]
+    # }
     ni_ends <- cumsum(ni)
     ni_starts <- c(1, ni_ends[-length(ni)] + 1)
     if(sum(ni) != nrow(metaData)) {
@@ -87,6 +89,7 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
     }
 
     nstudy <- length(ni) ## number of studies
+    batchvar <- as.factor(batchvar)
     studies <- unique(batchvar) ## vector of names of studies
 
 
@@ -105,7 +108,7 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
     }
     ##################################################
 
-    #print(dim(filtered_featuretable))
+
     #################################################################
     #### Network estimation & pseudovalue calculation per study #####
     #################################################################
@@ -140,14 +143,56 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
                             envir = environment())
     for(i in 1:nstudy) {
         feature_abd <- filtered_featuretable[ni_starts[i]:ni_ends[i], ]
-        res <- extractScore(x = feature_abd, cl = cl, comp = comp,
-                            net.est.method = net.est.method,
-                            net_ctrl = net_ctrl)
-        pseudoVal <- scale(res$pseudoVal, center = TRUE, scale = TRUE)
+        if(is.character(exposurevar)) {
+            if(length(unique(exposurevar)) != 2) {
+                stop("If exposure is categorical, it must have two categories!")
+            } else {
+                uniqueExposure <- unique(exposurevar)
+                groupA <- which(exposurevar[batchvar == studies[i]] == uniqueExposure[1])
+                groupB <- which(exposurevar[batchvar == studies[i]] == uniqueExposure[2])
+                xA <- feature_abd[groupA, , drop = FALSE]
+                xB <- feature_abd[groupB, , drop = FALSE]
+
+                if(nrow(xA) < 5 | nrow(xB) < 5) {
+                    if(verbose) {
+                        message(sprintf("Skipping study %s: too few samples per exposure (nA = %d, nB = %d)", studies[i], nrow(xA), nrow(xB)))
+                    }
+                    estimatedNet[[i]] <- NULL
+                    pseudoVal_list[[i]] <- NULL
+                    next
+                }
+
+                resA <- extractScore(x = xA, cl = cl, comp = comp,
+                                     net.est.method = net.est.method,
+                                     net_ctrl = net_ctrl)
+
+                pseudoVal_groupA <- resA$pseudoVal
+                resB <- extractScore(x = xB, cl = cl, comp = comp,
+                                     net.est.method = net.est.method,
+                                     net_ctrl = net_ctrl)
+
+                pseudoVal_groupB <- resB$pseudoVal
+                estimatedNet[[i]] <- list(estimatedNet_groupA = resA$estimatedNet,
+                                          estimatedNet_groupB = resB$estimatedNet)
+
+
+                pseudoVal <- matrix(NA, nrow(feature_abd), ncol(feature_abd))
+                pseudoVal[groupA, ] <- pseudoVal_groupA
+                pseudoVal[groupB, ] <- pseudoVal_groupB
+            }
+        } else {
+            res <- extractScore(x = feature_abd, cl = cl, comp = comp,
+                                net.est.method = net.est.method,
+                                net_ctrl = net_ctrl)
+
+            pseudoVal <- res$pseudoVal
+            estimatedNet[[i]] <- res$estimatedNet
+        }
+
+        pseudoVal <- scale(pseudoVal, center = TRUE, scale = TRUE)
         colnames(pseudoVal) <- colnames(filtered_featuretable) # Map the column names (feature names)
 
-        pseudoVal_list[[i]] <- pseudoVal
-        estimatedNet[[i]] <- res$estimatedNet
+        pseudoVal_list[[i]] <- pseudoVal ## standardized pseudovalues
         rm(pseudoVal)
         if(verbose) {
             cat(sprintf("Network estimated for study %d / %d\n", i, nstudy))
