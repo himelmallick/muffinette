@@ -54,7 +54,6 @@ muffinette_group(
 \item{control}{A named list of control parameters. May contain the following
 components:
 \describe{
-\item{batch}{A named list of control arguments for batch adjustment.}
 \item{meta}{A named list of control arguments for meta-analysis.}
 \item{network}{A named list of additional arguments passed to the
 network estimation method specified by \code{net.est.method}.}
@@ -76,10 +75,6 @@ The \code{control} argument allows fine-grained control of different stages
 of the pipeline:
 
 \itemize{
-\item \code{control$batch}: Controls batch adjustment with a named list of
-components, such as \code{zero_inflation}.
-See Details in \code{\link[MMUPHin:adjust_batch]{MMUPHin::adjust_batch()}}. Default values are taken from internal settings.
-
 \item \code{control$meta}: Controls the meta-analysis step for compositional
 data, including normalization, transformation and meta-analysis method.
 See Details in \code{\link[MMUPHin:lm_meta]{MMUPHin::lm_meta()}}. Default values are taken from internal settings.

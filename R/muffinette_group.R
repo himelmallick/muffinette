@@ -19,7 +19,6 @@
 #' @param control A named list of control parameters. May contain the following
 #' components:
 #' \describe{
-#'   \item{batch}{A named list of control arguments for batch adjustment.}
 #'   \item{meta}{A named list of control arguments for meta-analysis.}
 #'   \item{network}{A named list of additional arguments passed to the
 #'    network estimation method specified by \code{net.est.method}.}
@@ -32,10 +31,6 @@
 #' of the pipeline:
 #'
 #' \itemize{
-#'   \item \code{control$batch}: Controls batch adjustment with a named list of
-#'   components, such as \code{zero_inflation}.
-#'   See Details in [MMUPHin::adjust_batch()]. Default values are taken from internal settings.
-#'
 #'   \item \code{control$meta}: Controls the meta-analysis step for compositional
 #'   data, including normalization, transformation and meta-analysis method.
 #'   See Details in [MMUPHin::lm_meta()]. Default values are taken from internal settings.
@@ -58,13 +53,10 @@ muffinette_group <- function(metaAbd, batchvar, exposurevar, metaData,
 
     if(is.null(control))
         control <- list()
-    if(is.null(control$batch))
-        control$batch <- list()
     if(is.null(control$meta))
         control$meta <- list()
     if(is.null(control$network))
         control$network <- list()
-    batch_ctrl <- utils::modifyList(control_adjust_batch, control$batch)
     meta_ctrl <- utils::modifyList(control_lm_meta, control$meta)
     net_ctrl <- control$network
 

@@ -68,7 +68,7 @@ rownames(data_meta) <- colnames(data_abd)
 filtered_featuretable <- muffinette::filter_abdfeatures(x = t(data_abd),
                                                         abd_threshold = 0,
                                                         prev_threshold = 0.1)
-filtered_featuretable <- muffinette::filter_varfeatures(x = filtered_featuretable, topV = 100)
+filtered_featuretable <- muffinette::filter_varfeatures(x = filtered_featuretable, topV = NULL)
 
 meta_abd_mat <- t(as.matrix(filtered_featuretable)) ## feature-by-sample matrix
 ```
@@ -161,8 +161,10 @@ out_mmuphin <- MMUPHin::lm_meta(feature_abd = batch_corrected_abd,
 
 
 metafits_mmuphin <- out_mmuphin$meta_fits
-selected_features_mmuphin <- metafits_mmuphin[metafits_mmuphin$qval.fdr < 0.05, 1]
-selected_features_mmuphin
+selected_features_mmuphin1 <- metafits_mmuphin[metafits_mmuphin$qval.fdr < 0.05, 1]
+selected_features_mmuphin1
+selected_features_mmuphin2 <- metafits_mmuphin[metafits_mmuphin$qval.fdr < 0.25, 1]
+selected_features_mmuphin2
 ```
 
 
@@ -176,14 +178,16 @@ exposurevar <- data_meta$response
 out_muffinette <- muffinette::muffinette(metaAbd = data_abd,
                                 batchvar = batchvar, exposurevar = exposurevar,
                                 metaData = data_meta,
-                                filter = TRUE, abd_threshold = 0, prev_threshold = 0.1, topfeatures = 100,
+                                filter = TRUE, abd_threshold = 0, prev_threshold = 0.1, topfeatures = NULL,
                                 comp = TRUE, net.est.method = "SparCC",
                                 covariates = NULL, ncores = 4, verbose = TRUE, fixseed = 2310,
                                 control = list(network = list(iter = 20, inner_iter = 10, th = 0.1)))
 
 metafits_muffinette <- out_muffinette$metafits
-selected_features_muffinette <- metafits_muffinette[metafits_muffinette$qval < 0.05, 1]
-selected_features_muffinette
+selected_features_muffinette1 <- metafits_muffinette[metafits_muffinette$qval < 0.05, 1]
+selected_features_muffinette1
+selected_features_muffinette2 <- metafits_muffinette[metafits_muffinette$qval < 0.25, 1]
+selected_features_muffinette2
 ```
 
 ```{r muffinette_group}
@@ -193,20 +197,22 @@ exposurevar <- data_meta$response
 out_muffinette_group <- muffinette::muffinette_group(metaAbd = data_abd,
                                 batchvar = batchvar, exposurevar = exposurevar,
                                 metaData = data_meta,
-                                filter = TRUE, abd_threshold = 0, prev_threshold = 0.1, topfeatures = 100,
+                                filter = TRUE, abd_threshold = 0, prev_threshold = 0.1, topfeatures = NULL,
                                 comp = TRUE, net.est.method = "SparCC",
                                 covariates = NULL, ncores = 4, verbose = TRUE, fixseed = 2310,
                                 control = list(network = list(iter = 20, inner_iter = 10, th = 0.1)))
 
 metafits_muffinette_group <- out_muffinette_group$metafits
-selected_features_muffinette_group <- metafits_muffinette_group[metafits_muffinette_group$qval < 0.05, 1]
-selected_features_muffinette_group
+selected_features_muffinette_group1 <- metafits_muffinette_group[metafits_muffinette_group$qval < 0.05, 1]
+selected_features_muffinette_group1
+selected_features_muffinette_group2 <- metafits_muffinette_group[metafits_muffinette_group$qval < 0.25, 1]
+selected_features_muffinette_group2
 ```
 
-### Comparison of the Three Meta-Analysis Approaches
+### Comparison of the Three Meta-Analysis Approaches (threshold as 0.05)
 
 
-```{r compare, eval=FALSE}
+```{r compare0.05,echo=FALSE,eval=TRUE}
 fig_mmuphin <- metafits_mmuphin %>%
   filter(qval.fdr < 0.05) %>%
   mutate(feature = sub("^species:", "", feature)) %>%
@@ -219,22 +225,92 @@ fig_mmuphin <- metafits_mmuphin %>%
   labs(y = NULL, x = NULL,
        title = "MMUPHin")
 
-fig_muffinette <- metafits_muffinette %>%
+fig_muffinette_group <- metafits_muffinette_group %>%
   filter(qval < 0.05) %>%
   mutate(feature = sub("^species:", "", feature)) %>%
   ggplot(aes(y = coef, x = reorder(feature, coef))) +
   geom_bar(stat = "identity", fill = "lightpink") +
   coord_flip() +
   theme(axis.text.y = element_text(size = 5)) +
-  labs(y = NULL, x = NULL, title = "muffinette")
+  labs(y = NULL, x = NULL, title = "muffinette_group")
 
-fig <- ggarrange(fig_mmuphin, fig_muffinette, nrow = 2, heights = c(0.75, 1))
-fig <- annotate_figure(fig,
+if(length(selected_features_muffinette1) == 0) {
+    fig <- ggarrange(fig_mmuphin, fig_muffinette_group, nrow = 2, heights = c(0.75, 1))
+    fig <- annotate_figure(fig,
                        left = text_grob("Differentially Abundant Species",
                                         size = 8, face = "bold", rot = 90),
                        bottom = text_grob("Estimated Coefficients",
                                           size = 8, hjust = 0.5, face = "bold"))
+} else {
+    fig_muffinette <- metafits_muffinette %>%
+    filter(qval < 0.05) %>%
+    mutate(feature = sub("^species:", "", feature)) %>%
+    ggplot(aes(y = coef, x = reorder(feature, coef))) +
+    geom_bar(stat = "identity", fill = "lightpink") +
+    coord_flip() +
+    theme(axis.text.y = element_text(size = 5)) +
+    labs(y = NULL, x = NULL, title = "muffinette")
+    
+    fig <- ggarrange(fig_mmuphin, fig_muffinette, fig_muffinette_group, nrow = 3, heights = c(0.70, 0.70, 1))
+    fig <- annotate_figure(fig,
+                       left = text_grob("Differentially Abundant Species",
+                                        size = 8, face = "bold", rot = 90),
+                       bottom = text_grob("Estimated Coefficients",
+                                          size = 8, hjust = 0.5, face = "bold"))
+}
 fig
 ```
 
+
+### Comparison of the Three Meta-Analysis Approaches (threshold as 0.25)
+
+
+```{r compare0.25,echo=FALSE,eval=TRUE}
+fig_mmuphin <- metafits_mmuphin %>%
+  filter(qval.fdr < 0.25) %>%
+  mutate(feature = sub("^species:", "", feature)) %>%
+  arrange(coef) %>% 
+  mutate(feature = factor(feature, levels = feature)) %>%
+  ggplot(aes(y = coef, x = feature)) +
+  geom_bar(stat = "identity", fill = "lightpink") +
+  coord_flip() +
+  theme(axis.text.y = element_text(size = 6)) +
+  labs(y = NULL, x = NULL,
+       title = "MMUPHin")
+
+fig_muffinette_group <- metafits_muffinette_group %>%
+  filter(qval < 0.25) %>%
+  mutate(feature = sub("^species:", "", feature)) %>%
+  ggplot(aes(y = coef, x = reorder(feature, coef))) +
+  geom_bar(stat = "identity", fill = "lightpink") +
+  coord_flip() +
+  theme(axis.text.y = element_text(size = 5)) +
+  labs(y = NULL, x = NULL, title = "muffinette_group")
+
+if(length(selected_features_muffinette2) == 0) {
+    fig2 <- ggarrange(fig_mmuphin, fig_muffinette_group, nrow = 2, heights = c(0.75, 1))
+    fig2 <- annotate_figure(fig,
+                       left = text_grob("Differentially Abundant Species",
+                                        size = 8, face = "bold", rot = 90),
+                       bottom = text_grob("Estimated Coefficients",
+                                          size = 8, hjust = 0.5, face = "bold"))
+} else {
+    fig_muffinette <- metafits_muffinette %>%
+    filter(qval < 0.25) %>%
+    mutate(feature = sub("^species:", "", feature)) %>%
+    ggplot(aes(y = coef, x = reorder(feature, coef))) +
+    geom_bar(stat = "identity", fill = "lightpink") +
+    coord_flip() +
+    theme(axis.text.y = element_text(size = 5)) +
+    labs(y = NULL, x = NULL, title = "muffinette")
+    
+    fig2 <- ggarrange(fig_mmuphin, fig_muffinette, fig_muffinette_group, nrow = 3, heights = c(0.70, 0.70, 1))
+    fig2 <- annotate_figure(fig2,
+                       left = text_grob("Differentially Abundant Species",
+                                        size = 8, face = "bold", rot = 90),
+                       bottom = text_grob("Estimated Coefficients",
+                                          size = 8, hjust = 0.5, face = "bold"))
+}
+fig2
+```
 
