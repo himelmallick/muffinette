@@ -10,7 +10,6 @@
 #' @param abd_threshold numeric; threshold for abundance of features, only used when \code{filter = TRUE}. Default value: 0.
 #' @param prev_threshold numeric; threshold for prevalence of features, only used when \code{filter = TRUE}. Default value: 0.1.
 #' @param topfeatures number of features with highest variability to retain for analysis. Default value is \code{NULL} such that all the remaining features after removing the near zero predictors are kept.
-#' @param batchCorrect logical; only used when there are more than one studies. If TRUE, batch-effect correction is performed. Default value: TRUE.
 #' @param comp logical. If FALSE, the abundances are non-compositional and network construction step is avoided. Default value: TRUE.
 #' @param net.est.method method for network estimation. Default value: "SparCC".
 #' @param covariates optional covariates for batch effect correction. Default value: NULL.
@@ -54,7 +53,7 @@
 
 muffinette_group <- function(metaAbd, batchvar, exposurevar, metaData,
                        filter = TRUE, abd_threshold = 0, prev_threshold = 0.1, topfeatures = NULL,
-                       batchCorrect = TRUE, comp = TRUE, net.est.method = "SparCC",
+                       comp = TRUE, net.est.method = "SparCC",
                        covariates = NULL, ncores = 4, verbose = TRUE, fixseed = NULL, control = NULL){
 
     if(is.null(control))

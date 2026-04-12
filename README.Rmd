@@ -173,11 +173,11 @@ selected_features_mmuphin
 batchvar <- data_meta$study
 exposurevar <- data_meta$response
 
-out_muffinette <- muffinette::muffinette(metaAbd = batch_corrected_abd,
+out_muffinette <- muffinette::muffinette(metaAbd = data_abd,
                                 batchvar = batchvar, exposurevar = exposurevar,
                                 metaData = data_meta,
                                 filter = TRUE, abd_threshold = 0, prev_threshold = 0.1, topfeatures = NULL,
-                                batchCorrect = TRUE, count = FALSE, net.est.method = "SparCC",
+                                comp = TRUE, net.est.method = "SparCC",
                                 covariates = NULL, ncores = 4, verbose = TRUE, fixseed = 2310, iter = 20, inner_iter = 10, th = 0.1)
 
 metafits_muffinette <- out_muffinette$metafits
@@ -189,7 +189,7 @@ selected_features_muffinette
 ### Comparison of the Two Meta-Analysis Approaches
 
 
-```{r compare}
+```{r compare, eval=FALSE}
 fig_mmuphin <- metafits_mmuphin %>%
   filter(qval.fdr < 0.05) %>%
   mutate(feature = sub("^species:", "", feature)) %>%

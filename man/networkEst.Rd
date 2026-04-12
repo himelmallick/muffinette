@@ -4,12 +4,12 @@
 \alias{networkEst}
 \title{networkEst}
 \usage{
-networkEst(x, count = FALSE, estimethod = "SparCC", ...)
+networkEst(x, comp = TRUE, estimethod = "SparCC", ...)
 }
 \arguments{
 \item{x}{abundance matrix}
 
-\item{count}{logical. If TRUE, abundances are count instead of proportions. Default value: FALSE.}
+\item{comp}{logical. If FALSE, the abundances are non-compositional. Default value: TRUE.}
 
 \item{estimethod}{network estimation method. Options include "SparCC" and "SpiecEasi". Default value: SparCC.}
 
