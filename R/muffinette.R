@@ -62,7 +62,7 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
     meta_ctrl <- utils::modifyList(control_lm_meta, control$meta)
     net_ctrl <- control$network
 
-    metaAbd <- check_features_abd(metaAbd)
+    metaAbd <- check_features_abd(metaAbd, comp = comp)
 
     ni <- as.numeric(table(factor(batchvar, levels = unique(batchvar)))) ## vector of sample sizes for different studies
     ni_ends <- cumsum(ni)
@@ -71,11 +71,11 @@ muffinette <- function(metaAbd, batchvar, exposurevar, metaData,
         stop("Total number of samples in feature_abd_list mismatch with metaData!")
     }
 
-    if(comp) {
-        if(!all(round(colSums(metaAbd)) == 1)) {
-            stop("If comp is TRUE, abundances must be compositional.")
-        }
-    }
+    # if(comp) {
+    #     if(!all(round(colSums(metaAbd)) == 1)) {
+    #         stop("If comp is TRUE, abundances must be compositional.")
+    #     }
+    # }
 
     nstudy <- length(ni) ## number of studies
     batchvar <- as.factor(batchvar)

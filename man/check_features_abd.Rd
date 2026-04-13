@@ -4,14 +4,16 @@
 \alias{check_features_abd}
 \title{check_features_abd}
 \usage{
-check_features_abd(feature_abd)
+check_features_abd(feature_abd, comp)
 }
 \arguments{
-\item{feature_abd}{a sample-by-feature data frame.}
+\item{feature_abd}{a feature-by-sample data frame.}
+
+\item{comp}{logical. If FALSE, the abundances are assumed non-compositional.}
 }
 \value{
-error messages if feature abundances are (1) missing, (2) negative, (3) not proportions.
+error messages if feature abundances are (1) negative, and converts to proportions if comp is TRUE yet the abundances are not proportions.
 }
 \description{
-function to ensure that feature abundances are neither missing nor negative.
+function to ensure that feature abundances are neither missing nor negative. Missing abundances are replaced by zeros.
 }
