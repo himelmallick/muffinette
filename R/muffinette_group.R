@@ -9,13 +9,15 @@
 #' @param batchvar a character vector mapping each observation to its originating study.
 #' @param exposurevar a character vector mapping each observation to its level of a binary exposure variable, else a vector of values of a continuous exposure variable.
 #' @param metaData a data frame of metadata, columns must include exposure, batch as factor, covariates to adjust for, if any.
-#' @param prevfilter logical. If TRUE, features are filtered according to specified abundance and prevalence thresholds. Default value: TRUE.
+#' @param prevfilter logical; if TRUE, features are filtered according to specified abundance and prevalence thresholds. Default value: TRUE.
+#' @param filter_perstudy logical; if TRUE, prevalence and/or variance filtering is applied on each study instead of \code{metaAbd}.
 #' @param abd_threshold numeric; threshold for abundance of features, used only when \code{prevfilter = TRUE}. Default value: 0.
 #' @param prev_threshold numeric; threshold for prevalence of features, used only when \code{prevfilter = TRUE}. Default value: 0.1.
 #' @param topfeatures number of features with highest variability to retain for analysis. Default value is \code{NULL} such that all the remaining features after removing the near zero predictors are kept.
 #' @param comp logical. If FALSE, the abundances are non-compositional and network construction step is avoided. Default value: TRUE.
 #' @param net.est.method method for network estimation. Default value: "SparCC".
-#' @param covariates optional covariates for batch effect correction. Default value: NULL.
+#' @param covariates optional covariates to adjust for in Maaslin2 model. Default value: NULL.
+#' @param covariates_random optional random effects to adjust for in Maaslin2 model. Default value: NULL.
 #' @param ncores number of cores to use for leave-one-subject-out network estimation in parallel.
 #' @param verbose logical. If TRUE, print out number of iterations and computational time. Default value: TRUE.
 #' @param fixseed seed for reproducibility
