@@ -92,11 +92,36 @@ muffinette_group <- function(metaAbd, feature_abd_list = NULL, batchvar, exposur
     names(exposurevar) <- sample_names
 
     if(!is.null(covariates)) {
+        covariates <- as.data.frame(covariates)
         rownames(covariates) <- sample_names
+
+        char_covs <- vapply(covariates, is.character, logical(1))
+
+        if(any(char_covs)) {
+            covariates[char_covs] <- lapply(covariates[char_covs], as.factor)
+        }
+    }
+
+    if(!is.null(covariates) && nrow(as.data.frame(covariates)) != length(sample_names)) {
+        stop("`covariates` must have one row per sample.")
     }
 
     if(!is.null(covariates_random)) {
+        covariates_random <- as.data.frame(covariates_random)
         rownames(covariates_random) <- sample_names
+
+        char_covs_random <- vapply(covariates_random, is.character, logical(1))
+
+        if(any(char_covs_random)) {
+            covariates_random[char_covs_random] <- lapply(
+                covariates_random[char_covs_random],
+                as.factor
+            )
+        }
+    }
+
+    if(!is.null(covariates_random) && nrow(as.data.frame(covariates_random)) != length(sample_names)) {
+        stop("`covariates_random` must have one row per sample.")
     }
 
     batchvar <- as.factor(batchvar)
