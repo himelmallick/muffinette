@@ -10,8 +10,9 @@
 filter_abdfeatures <- function(x, abd_threshold, prev_threshold) {
     # x is a data frame with features as variables/columns
     x <- as.data.frame(x)
-    x <- x[, colMeans(x > abd_threshold) > prev_threshold]
-    
-    x
+    # x <- x[, colMeans(x > abd_threshold) > prev_threshold]
+    # x
+    keep <- colMeans(!is.na(x) & x > abd_threshold) > prev_threshold
+    x[, keep, drop = FALSE]
 }
 
