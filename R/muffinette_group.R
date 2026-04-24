@@ -264,7 +264,7 @@ muffinette_group <- function(metaAbd, feature_abd_list = NULL, batchvar, exposur
         }
 
         pseudoVal <- scale(pseudoVal, center = TRUE, scale = TRUE)
-        colnames(pseudoVal) <- colnames(feature_abd) # Map the column names (feature names)
+        dimnames(pseudoVal) <- dimnames(feature_abd) # Map the dim names (feature names)
 
         pseudoVal_list[[i]] <- pseudoVal ## standardized pseudovalues
         rm(pseudoVal)
@@ -311,6 +311,8 @@ muffinette_group <- function(metaAbd, feature_abd_list = NULL, batchvar, exposur
         #########################################
         ### Batch-correction of pseudo-values ###
         #########################################
+        # print(str(data_meta$exposure))
+        # print(unique(data_meta$exposure))
         mod_combat <- stats::model.matrix(~ exposure, data = data_meta)
         pseudoVal_abd_batchCtd <- sva::ComBat(dat = t(pseudoVal_abd),
                                               batch = data_meta$study,
