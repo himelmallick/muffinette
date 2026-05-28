@@ -10,7 +10,7 @@
 #' @param exposurevar a character vector mapping each observation to its level of a binary exposure variable, else a vector of values of a continuous exposure variable.
 #' @param metaData a data frame of metadata, columns must include exposure, batch as factor, covariates to adjust for, if any.
 #' @param prevfilter logical; if TRUE, features are filtered according to specified abundance and prevalence thresholds. Default value: TRUE.
-#' @param filter_perstudy logical; if TRUE, prevalence and/or variance filtering is applied on each study instead of \code{metaAbd}.
+#' @param filter_perstudy logical; if TRUE, prevalence and/or variance filtering is applied on each study instead of \code{metaAbd}. Default value: TRUE.
 #' @param abd_threshold numeric; threshold for abundance of features, used only when \code{prevfilter = TRUE}. Default value: 0.
 #' @param prev_threshold numeric; threshold for prevalence of features, used only when \code{prevfilter = TRUE}. Default value: 0.1.
 #' @param topfeatures number of features with highest variability to retain for analysis. Default value is \code{NULL} such that all the remaining features after removing the near zero predictors are kept.
@@ -52,7 +52,7 @@
 #' @export
 
 muffinette_group <- function(metaAbd, feature_abd_list = NULL, batchvar, exposurevar, metaData,
-                       prevfilter = TRUE, filter_perstudy = FALSE, abd_threshold = 0, prev_threshold = 0.1, topfeatures = NULL,
+                       prevfilter = TRUE, filter_perstudy = TRUE, abd_threshold = 0, prev_threshold = 0.1, topfeatures = NULL,
                        comp = TRUE, net.est.method = "SparCC",
                        covariates = NULL, covariates_random = NULL, ncores = 4, verbose = TRUE, fixseed = NULL, control = NULL){
 
@@ -74,12 +74,6 @@ muffinette_group <- function(metaAbd, feature_abd_list = NULL, batchvar, exposur
         stop("Total number of samples in feature_abd_list mismatch with `metaData`!")
     }
     nstudy <- length(ni) ## number of studies
-
-    # if(comp) {
-    #     if(!all(round(colSums(metaAbd)) == 1)) {
-    #         stop("If comp is TRUE, abundances must be compositional.")
-    #     }
-    # }
 
     sample_names <- rownames(metaData)
 
@@ -201,12 +195,16 @@ muffinette_group <- function(metaAbd, feature_abd_list = NULL, batchvar, exposur
         # generate independent streams for workers
         parallel::clusterSetRNGStream(cl, iseed = fixseed)
     }
-    parallel::clusterEvalQ(cl, {
-        if(!requireNamespace("SpiecEasi", quietly = TRUE)) {
-            stop("Package 'SpiecEasi' is required.")
-        }
-        NULL
-    })
+
+    if (comp && net.est.method == "SpiecEasi") {
+        parallel::clusterEvalQ(cl, {
+            if(!requireNamespace("SpiecEasi", quietly = TRUE)) {
+                stop("Package 'SpiecEasi' is required.")
+            }
+            NULL
+        })
+    }
+
     parallel::clusterExport(cl, varlist = c("networkEst", "comp",
                                             "net.est.method", "net_ctrl"),
                             envir = environment())
@@ -217,7 +215,7 @@ muffinette_group <- function(metaAbd, feature_abd_list = NULL, batchvar, exposur
             feature_abd <- filtered_featuretable[ni_starts[i]:ni_ends[i], ]
         }
 
-        if(is.character(exposurevar)) {
+        if(is.character(exposurevar) || is.factor(exposurevar)) {
             if(length(unique(exposurevar)) != 2) {
                 stop("If exposure is categorical, it must have two categories!")
             } else {
@@ -286,7 +284,9 @@ muffinette_group <- function(metaAbd, feature_abd_list = NULL, batchvar, exposur
     #########################################
     #########################################
 
-    if(nstudy > 1) {
+    n_remain <- length(pseudoVal_list)
+
+    if(n_remain > 1) {
         keep_samples <- rownames(pseudoVal_abd)
 
         data_meta <- data.frame(sampleID = keep_samples,

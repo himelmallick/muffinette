@@ -11,7 +11,7 @@ muffinette_group(
   exposurevar,
   metaData,
   prevfilter = TRUE,
-  filter_perstudy = FALSE,
+  filter_perstudy = TRUE,
   abd_threshold = 0,
   prev_threshold = 0.1,
   topfeatures = NULL,
@@ -38,7 +38,7 @@ muffinette_group(
 
 \item{prevfilter}{logical; if TRUE, features are filtered according to specified abundance and prevalence thresholds. Default value: TRUE.}
 
-\item{filter_perstudy}{logical; if TRUE, prevalence and/or variance filtering is applied on each study instead of \code{metaAbd}.}
+\item{filter_perstudy}{logical; if TRUE, prevalence and/or variance filtering is applied on each study instead of \code{metaAbd}. Default value: TRUE.}
 
 \item{abd_threshold}{numeric; threshold for abundance of features, used only when \code{prevfilter = TRUE}. Default value: 0.}
 
