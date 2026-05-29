@@ -6,16 +6,19 @@
 \usage{
 muffinette(
   metaAbd,
+  feature_abd_list = NULL,
   batchvar,
   exposurevar,
   metaData,
-  filter = TRUE,
+  prevfilter = TRUE,
+  filter_perstudy = TRUE,
   abd_threshold = 0,
   prev_threshold = 0.1,
   topfeatures = NULL,
   comp = TRUE,
   net.est.method = "SparCC",
   covariates = NULL,
+  covariates_random = NULL,
   ncores = 4,
   verbose = TRUE,
   fixseed = NULL,
@@ -25,17 +28,21 @@ muffinette(
 \arguments{
 \item{metaAbd}{a feature-by-sample matrix of abundances across all studies. The abundances must be normalized.}
 
+\item{feature_abd_list}{a list of feature-by-sample matrices of abundances per study; this is necessary only when \code{filter_perstudy = TRUE}.}
+
 \item{batchvar}{a character vector mapping each observation to its originating study.}
 
 \item{exposurevar}{a character vector mapping each observation to its level of a binary exposure variable, else a vector of values of a continuous exposure variable.}
 
 \item{metaData}{a data frame of metadata, columns must include exposure, batch as factor, covariates to adjust for, if any.}
 
-\item{filter}{logical. If TRUE, features are filtered according to specified abundance and prevalence thresholds. Default value: TRUE.}
+\item{prevfilter}{logical; if TRUE, features are filtered according to specified abundance and prevalence thresholds. Default value: TRUE.}
 
-\item{abd_threshold}{numeric; threshold for abundance of features, only used when \code{filter = TRUE}. Default value: 0.}
+\item{filter_perstudy}{logical; if TRUE, prevalence and/or variance filtering is applied on each study instead of \code{metaAbd}. Default value: TRUE.}
 
-\item{prev_threshold}{numeric; threshold for prevalence of features, only used when \code{filter = TRUE}. Default value: 0.1.}
+\item{abd_threshold}{numeric; threshold for abundance of features, used only when \code{prevfilter = TRUE}. Default value: 0.}
+
+\item{prev_threshold}{numeric; threshold for prevalence of features, used only when \code{prevfilter = TRUE}. Default value: 0.1.}
 
 \item{topfeatures}{number of features with highest variability to retain for analysis. Default value is \code{NULL} such that all the remaining features after removing the near zero predictors are kept.}
 
@@ -43,7 +50,9 @@ muffinette(
 
 \item{net.est.method}{method for network estimation. Default value: "SparCC".}
 
-\item{covariates}{optional covariates for batch effect correction. Default value: NULL.}
+\item{covariates}{optional covariates to adjust for in Maaslin2 model. Default value: NULL.}
+
+\item{covariates_random}{optional random effects to adjust for in Maaslin2 model. Default value: NULL.}
 
 \item{ncores}{number of cores to use for leave-one-subject-out network estimation in parallel.}
 
@@ -64,13 +73,13 @@ Missing components are replaced by defaults.}
 }
 \value{
 a list with
-\item{metafits}{data frame with columns as feature names, effect sizes, p-values and q-values, heterogeneity statistics; returned only when there are multiple studies.}
+\item{metafits}{data frame with columns as feature names, effect sizes, p-values and q-values, heterogeneity statistics.}
 \item{pseudoValues}{sample-by-feature matrix of pseudovalues.}
-\item{pseudoValues_batchCtd}{sample-by-feature matrix of batch-corrected pseudovalues, in presence of multiple studies.}
-\item{estimatedNet}{the estimated network based on all the subjects; returned only when \code{returm_net} is TRUE.}
 }
 \description{
-Meta-analysis of networks using a pseudo-value approach
+Meta-analysis of feature abundances using a network connectivity approach.
+Normalized abundances must be provided for per-study network construction and connectivity score calculation.
+Standardized connectivity scores are corrected for batch (study) effect for subsequent meta-analysis.
 }
 \details{
 The \code{control} argument allows fine-grained control of different stages
@@ -78,13 +87,13 @@ of the pipeline:
 
 \itemize{
 \item \code{control$meta}: Controls the meta-analysis step for compositional
-data, including normalization, transformation and meta-analysis method.
-See Details in \code{\link[MMUPHin:lm_meta]{MMUPHin::lm_meta()}}. Default values are taken from internal settings.
+data, including \code{analysis_method} parameter for Maaslin2 and meta-analysis method.
+See Details in \code{\link[MMUPHin:maaslin_meta]{MMUPHin::maaslin_meta()}}. Default values are taken from internal settings.
 
 \item \code{control$network}: Additional arguments passed to the selected
 network estimation method. The valid arguments depend on
 \code{net.est.method}.
 }
 
-Any unspecified arguments fall back to their default values.
+Any unspecified arguments are set to their default values.
 }

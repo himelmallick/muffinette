@@ -1,4 +1,4 @@
-#' @title muffinette_group
+#' @title muffinette
 #'
 #' @description Meta-analysis of feature abundances using a network connectivity approach.
 #' Normalized abundances must be provided for per-study network construction and connectivity score calculation.
@@ -38,7 +38,7 @@
 #' \itemize{
 #'   \item \code{control$meta}: Controls the meta-analysis step for compositional
 #'   data, including \code{analysis_method} parameter for Maaslin2 and meta-analysis method.
-#'   See Details in [MMUPHin::lm_meta()]. Default values are taken from internal settings.
+#'   See Details in [MMUPHin::maaslin_meta()]. Default values are taken from internal settings.
 #'
 #'   \item \code{control$network}: Additional arguments passed to the selected
 #'   network estimation method. The valid arguments depend on
@@ -51,7 +51,7 @@
 #' \item{pseudoValues}{sample-by-feature matrix of pseudovalues.}
 #' @export
 
-muffinette_group <- function(metaAbd, feature_abd_list = NULL, batchvar, exposurevar, metaData,
+muffinette <- function(metaAbd, feature_abd_list = NULL, batchvar, exposurevar, metaData,
                        prevfilter = TRUE, filter_perstudy = TRUE, abd_threshold = 0, prev_threshold = 0.1, topfeatures = NULL,
                        comp = TRUE, net.est.method = "SparCC",
                        covariates = NULL, covariates_random = NULL, ncores = 4, verbose = TRUE, fixseed = NULL, control = NULL){
