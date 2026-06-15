@@ -378,7 +378,7 @@ muffinette_revised <- function(metaAbd, batchvar, exposurevar, metaData,
                 xA <- feature_abd[groupA, , drop = FALSE]
                 xB <- feature_abd[groupB, , drop = FALSE]
 
-                if(nrow(xA) < 10 | nrow(xB) < 10) {
+                if(nrow(xA) < 2 | nrow(xB) < 2) {
                     if(verbose) {
                         message(sprintf("Skipping study %s: too few samples per exposure (nA = %d, nB = %d)", studies[i], nrow(xA), nrow(xB)))
                     }
