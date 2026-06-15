@@ -18,14 +18,18 @@ check_features_abd <- function(feature_abd, comp) {
     # if(!all(feature_abd_cleaned <= 1)) {
     #     stop("Feature abundances must be proportions!")
     # }
-    if(comp) {
-        cs <- colSums(feature_abd_cleaned)
-        if(!all(abs(cs - 1) < 1e-8)) {
-            message("comp is TRUE: Converting to proportions")
-            feature_abd_cleaned <- feature_abd_cleaned / cs
-        }
-    }
+    # if(comp) {
+    #     cs <- colSums(feature_abd_cleaned)
+    #     if(!all(abs(cs - 1) < 1e-8)) {
+    #         message("comp is TRUE: Converting to proportions")
+    #         feature_abd_cleaned <- feature_abd_cleaned / cs
+    #     }
+    # }
 
+    if(comp) {
+            message("comp is TRUE: Converting to proportions")
+            feature_abd_cleaned <- feature_abd_cleaned / 100
+        }
 
     feature_abd_cleaned
 }
