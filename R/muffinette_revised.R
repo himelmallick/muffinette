@@ -508,12 +508,12 @@ muffinette_revised <- function(metaAbd, batchvar, exposurevar, metaData,
                        pseudoValues_batchCtd = pseudoVal_abd_batchCtd,
                        estimatedNet = estimatedNet,
                        metaAbd = metaAbd,
-                       metaData = metaData)
+                       data_meta = data_meta)
     } else {
         output <- list(pseudoValues = pseudoVal_abd,
                        estimatedNet = estimatedNet,
                        metaAbd = metaAbd,
-                       metaData = metaData)
+                       data_meta = data_meta)
     }
 
     output
