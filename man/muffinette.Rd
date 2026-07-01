@@ -6,7 +6,6 @@
 \usage{
 muffinette(
   metaAbd,
-  feature_abd_list = NULL,
   batchvar,
   exposurevar,
   metaData,
@@ -27,8 +26,6 @@ muffinette(
 }
 \arguments{
 \item{metaAbd}{a feature-by-sample matrix of abundances across all studies. The abundances must be normalized.}
-
-\item{feature_abd_list}{a list of feature-by-sample matrices of abundances per study; this is necessary only when \code{filter_perstudy = TRUE}.}
 
 \item{batchvar}{a character vector mapping each observation to its originating study.}
 
